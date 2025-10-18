@@ -1,5 +1,5 @@
 const express = require("express");
-const connectDB = require("./config/db");
+const connectDB = require("./src/config/db");
 require("dotenv").config();
 
 const app = express();
@@ -12,6 +12,10 @@ async function start() {
     app.use(express.json());
 
     app.use(express.urlencoded({ extended: true }));
+
+    // Admin routes (mount)
+    app.use("/api/admin/reviews", require("./src/routes/reviewRoute"));
+
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
