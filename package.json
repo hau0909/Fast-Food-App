@@ -1,0 +1,20 @@
+{
+  "name": "fast-food-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-backend": "npm run dev --prefix backend",
+    "start-backend": "npm start --prefix backend",
+    "start-app": "npm start --prefix app",
+    "dev": "concurrently \"npm:dev-backend\" \"npm:start-app\"",
+    "start": "concurrently \"npm:start-backend\" \"npm:start-app\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
