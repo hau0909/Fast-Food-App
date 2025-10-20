@@ -15,6 +15,7 @@ async function start() {
 
     // Admin routes (mount)
     app.use("/api/admin/reviews", require("./src/routes/reviewRoute"));
+    app.use("/api/admin/users", require("./src/routes/userRoute"));
 
 
     app.listen(PORT, () => {
