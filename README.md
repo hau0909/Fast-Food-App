@@ -12,39 +12,7 @@ Dự án này là một hệ thống đặt đồ ăn nhanh, được xây dựn
     *   **Toolkit:** Expo
     *   **Ngôn ngữ:** TypeScript
 
-## 📋 Yêu cầu cần có
-
-Đảm bảo bạn đã cài đặt các công cụ sau trên máy của mình:
-
-*   [Node.js](https://nodejs.org/) (phiên bản 18.x LTS hoặc cao hơn)
-*   [NPM](https://www.npmjs.com/) hoặc [Yarn](https://yarnpkg.com/)
-*   [MongoDB](https://www.mongodb.com/try/download/community)
-*   [Git](https://git-scm.com/)
-*   [Expo Go App](https://expo.dev/go) trên điện thoại của bạn.
-
-## 🚀 Cài đặt & Thiết lập
-
-Thực hiện các bước sau để thiết lập dự án trên máy của bạn:
-
-**Bước 1: Clone Repository**
-```bash
-git clone <URL_REPOSITORY_CUA_BAN>
-cd <TEN_THU_MUC_DU_AN>
-```
-
-**Bước 2: Cài đặt Dependencies**
-Chạy các lệnh sau từ **thư mục gốc** của dự án.
-```bash
-# Cài đặt cho thư mục gốc (concurrently)
-npm install
-
-# Cài đặt cho backend
-npm install --prefix backend
-
-# Cài đặt cho app
-npm install --prefix app
-```
-> **Lưu ý:** Chúng ta cần chạy 3 lệnh `install` vì đây là một cấu trúc monorepo với 3 file `package.json` riêng biệt.
+## 📋 Yêu cầu cần 4 file `package.json` riêng biệt.
 
 **Bước 3: Thiết lập Biến môi trường cho Backend**
 File `.env` chứa các thông tin nhạy cảm và sẽ không được đưa lên Git.
