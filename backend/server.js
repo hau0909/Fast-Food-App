@@ -17,6 +17,13 @@ async function start() {
     app.use("/api/admin/reviews", require("./src/routes/reviewRoute"));
     app.use("/api/admin/users", require("./src/routes/userRoute"));
 
+    //* User routes
+
+    // product route
+    app.use("/api/products", require("./src/routes/productRoutes"));
+
+    // handle error middleware
+    app.use(require("./src/middlewares/errorHandler"));
 
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
