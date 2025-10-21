@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+require("./Category");
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -13,7 +14,6 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     is_available: { type: Boolean, default: true },
-    calories: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -1,12 +1,6 @@
 const Review = require("../models/Review");
 const Order = require("../models/Order");
-const Product = require("../models/Product");// for populating product name
-
-
-
-
-
-
+const Product = require("../models/Product"); // for populating product name
 
 /**
  * Admin controllers section:
@@ -41,7 +35,10 @@ const approveReview = async (req, res, next) => {
       { is_approved: true },
       { new: true }
     );
-    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     return res.json({ success: true, data: review });
   } catch (err) {
     return next(err);
@@ -57,7 +54,10 @@ const hideReview = async (req, res, next) => {
       { is_approved: false },
       { new: true }
     );
-    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     return res.json({ success: true, data: review });
   } catch (err) {
     return next(err);
@@ -69,7 +69,10 @@ const deleteReview = async (req, res, next) => {
   try {
     const reviewId = req.params.id;
     const review = await Review.findByIdAndDelete(reviewId);
-    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     return res.json({ success: true, message: "Review deleted" });
   } catch (err) {
     return next(err);
