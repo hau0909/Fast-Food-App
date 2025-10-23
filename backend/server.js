@@ -22,6 +22,10 @@ async function start() {
     // product route
     app.use("/api/products", require("./src/routes/productRoutes"));
 
+    //* Auth routes
+
+    app.use("/api/auth", require("./src/routes/authRoutes"));
+
     // handle error middleware
     app.use(require("./src/middlewares/errorHandler"));
 
