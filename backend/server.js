@@ -1,5 +1,6 @@
 const express = require("express");
 const connectDB = require("./src/config/db");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
@@ -8,6 +9,8 @@ const PORT = process.env.PORT || 8000;
 async function start() {
   try {
     await connectDB();
+
+    app.use(cors());
 
     app.use(express.json());
 
@@ -23,7 +26,6 @@ async function start() {
     app.use("/api/products", require("./src/routes/productRoutes"));
 
     //* Auth routes
-
     app.use("/api/auth", require("./src/routes/authRoutes"));
 
     // handle error middleware
