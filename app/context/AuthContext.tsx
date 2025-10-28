@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const loadToken = async () => {
       try {
+        // AsyncStorage.clear();
         const storedToken = await AsyncStorage.getItem("token");
 
         // nếu có token
@@ -30,13 +31,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (res.valid) {
             setToken(storedToken);
             setUser(true);
+            setLoading(false);
           } else {
             await AsyncStorage.removeItem("token");
           }
         }
 
         // clear storage
-        // AsyncStorage.clear();
+        AsyncStorage.clear();
       } catch (err) {
         console.error("Token check failed:", err);
       } finally {
