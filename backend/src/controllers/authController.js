@@ -6,17 +6,24 @@ require("dotenv").config();
 // [POST] /api/register
 const register = async (req, res, next) => {
   try {
-    const { username, email, password } = req.body;
+    const { email, password, address, phoneNumber, fullName } = req.body;
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      const error = new Error("Email is alredy use");
+      error.status = 401;
+      throw error;
+    }
+
     const newUser = await User.create({
-      username: username ?? "~",
-      email,
+      username: "~",
+      email: email,
       password: hashedPassword,
-      address: "~",
-      phone_number: "~",
-      full_name: "~",
+      address: address,
+      phone_number: phoneNumber,
+      full_name: fullName,
       role: "user",
     });
     res

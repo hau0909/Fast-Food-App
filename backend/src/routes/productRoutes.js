@@ -8,15 +8,17 @@ const {
 const filterMiddleware = require("../middlewares/filterProduct");
 const sortMiddleware = require("../middlewares/sortProduct");
 const pagingMiddleware = require("../middlewares/pagingProduct");
+const { verifyToken } = require("../middlewares/auth");
 
 router.get(
   "/",
+  verifyToken,
   filterMiddleware,
   sortMiddleware,
   pagingMiddleware,
   getAllProducts
 );
 
-router.get("/:id", getProductById);
+router.get("/:id", verifyToken, getProductById);
 
 module.exports = router;
