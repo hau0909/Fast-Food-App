@@ -14,6 +14,7 @@ const ProductSchema = new mongoose.Schema(
       required: true,
     },
     is_available: { type: Boolean, default: true },
+    calories: { type: Number, default: null },
   },
   { timestamps: true }
 );

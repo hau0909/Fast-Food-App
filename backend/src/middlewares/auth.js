@@ -9,6 +9,7 @@ exports.verifyToken = (req, res, next) => {
   jwt.verify(token, process.env.JWT_TOKEN_SECRET, (err, decoded) => {
     if (err) return res.status(401).json({ message: "Invalid token" });
     req.userId = decoded.id;
+    req.userRole = decoded.role;
     next();
   });
 };
