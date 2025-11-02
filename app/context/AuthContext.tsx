@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         // clear storage
-        AsyncStorage.clear();
+        // AsyncStorage.clear();
       } catch (err) {
         console.error("Token check failed:", err);
       } finally {

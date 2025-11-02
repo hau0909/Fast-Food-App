@@ -94,4 +94,11 @@ export const GLOBAL_STYLE = StyleSheet.create({
   col: {
     flexDirection: "column",
   },
+
+  // image
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 25,
+  },
 });

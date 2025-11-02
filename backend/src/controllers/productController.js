@@ -4,22 +4,20 @@ const Product = require("../models/Product");
 const getAllProducts = async (req, res, next) => {
   try {
     const { filter, sortOptions, paging } = req;
-    const { skip, limitNum, pageNum } = paging;
+    // const { skip, limitNum, pageNum } = paging;
 
     const [products, total] = await Promise.all([
-      Product.find(filter)
-        .populate("category_id", "name")
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(limitNum),
+      Product.find(filter).populate("category_id", "name").sort(sortOptions),
+      // .skip(skip)
+      // .limit(limitNum),
       Product.countDocuments(filter),
     ]);
 
     return res.json({
       total,
-      page: pageNum,
-      limit: limitNum,
-      totalPages: Math.ceil(total / limitNum),
+      // page: pageNum,
+      // limit: limitNum,
+      // totalPages: Math.ceil(total / limitNum),
       data: products,
     });
   } catch (err) {
