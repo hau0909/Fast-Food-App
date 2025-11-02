@@ -4,6 +4,8 @@ import MainTabs from "./MainTabs";
 import AuthStack from "./AuthStack";
 import { useAuth } from "../context/AuthContext";
 import { ActivityIndicator, View } from "react-native";
+import Details from "../screens/Details";
+import Checkout from "../screens/Checkout";
 
 const RootStack = createStackNavigator();
 
@@ -20,11 +22,23 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Navigator>
         {!user ? (
-          <RootStack.Screen name="Auth" component={AuthStack} />
+          <RootStack.Screen
+            name="Auth"
+            component={AuthStack}
+            options={{ headerShown: false }}
+          />
         ) : (
-          <RootStack.Screen name="MainTabs" component={MainTabs} />
+          <>
+            <RootStack.Screen
+              name="MainTabs"
+              component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <RootStack.Screen name="Details" component={Details} />
+            <RootStack.Screen name="Checkout" component={Checkout} />
+          </>
         )}
       </RootStack.Navigator>
     </NavigationContainer>
