@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabBar from "../components/TabBar";
 import Profiles from "../screens/Profiles";
 import Home from "../screens/Home";
-import Cart from "../screens/Cart";
+import Cart from "../screens/UserCart";
 import HomeHeader from "../components/HomeHeader";
 
 const Tab = createBottomTabNavigator();
