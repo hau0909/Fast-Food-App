@@ -7,7 +7,8 @@ import { Product } from "../type/Product";
 export default function Card({ product }: { product: Product }) {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
-  const defaultImage = require("../assets/img/default.png");
+  const defaultImage =
+    "https://cdn-icons-png.flaticon.com/512/5787/5787100.png";
 
   return (
     <View style={[styles.card, { margin: 10 }]}>
@@ -16,7 +17,9 @@ export default function Card({ product }: { product: Product }) {
           <Image
             style={GLOBAL_STYLE.image}
             source={
-              product.image_url ? { uri: product.image_url } : defaultImage
+              product.image_url
+                ? { uri: product.image_url }
+                : { uri: defaultImage }
             }
           />
           <Text numberOfLines={1} ellipsizeMode="tail" style={styles.cardTitle}>

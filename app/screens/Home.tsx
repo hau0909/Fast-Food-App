@@ -13,7 +13,6 @@ export default function Home() {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
 
   const [products, setProducts] = useState<Product[] | null>(null);
-  const [filters, setFilters] = useState<ProductFilters | {}>({});
 
   useEffect(() => {
     getProducts({});
@@ -30,7 +29,6 @@ export default function Home() {
   };
 
   const handleApplyFilters = (newFilters: ProductFilters) => {
-    setFilters(newFilters);
     getProducts(newFilters);
   };
 

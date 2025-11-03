@@ -10,21 +10,50 @@ import { GLOBAL_STYLE } from "../styles/globalStyle";
 import { COLORS } from "../styles/colors";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
-import { useState } from "react";
-import { OrderItem } from "../type/OrderItem";
+import { useEffect, useState } from "react";
 import { CartItem } from "../type/CartItem";
+import { deleteCartItem, updateCartItemQuantity } from "../services/cartApi";
 
-export default function CartItem({ cartItem }: { cartItem: CartItem }) {
+export default function CartListItem({
+  cartItem,
+  onRefresh,
+}: {
+  cartItem: CartItem;
+  onRefresh: () => void;
+}) {
   const [quantity, setQuantity] = useState(cartItem.quantity);
-  const [unitPrice, setUnitPrice] = useState(14.2);
+  const { product } = cartItem;
+  const unitPrice = product.price;
+
+  const defaultImage =
+    "https://cdn-icons-png.flaticon.com/512/5787/5787100.png";
+
+  useEffect(() => {
+    if (quantity === cartItem.quantity) {
+      return;
+    }
+    const handler = setTimeout(() => {
+      updateQuantityOnServer(quantity);
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(handler);
+  }, [quantity]);
+
+  const updateQuantityOnServer = async (newQuantity: number) => {
+    const res = await updateCartItemQuantity(cartItem._id, newQuantity);
+    if (!res.success) {
+      Alert.alert("Error", res.err || "Could not update item quantity.");
+      setQuantity(cartItem.quantity);
+    } else {
+      onRefresh();
+    }
+  };
 
   const handleUpdateQuantity = ({ act }: { act: string }) => {
     if (act === "plus") {
       setQuantity((prev) => prev + 1);
       return;
     }
-
-    // act === minus
     if (quantity <= 1) {
       handleDelete();
     } else {
@@ -34,10 +63,18 @@ export default function CartItem({ cartItem }: { cartItem: CartItem }) {
 
   const handleDelete = async () => {
     Alert.alert("Delete Item", "Are you sure you want to delete this item?", [
-      { text: "Cancel", onPress: () => {} },
+      { text: "Cancel", style: "cancel" },
       {
         text: "Ok",
-        onPress: () => {},
+        style: "destructive",
+        onPress: async () => {
+          const res = await deleteCartItem(cartItem._id);
+          if (res.success) {
+            onRefresh();
+          } else {
+            Alert.alert("Error", res.err || "Could not delete item.");
+          }
+        },
       },
     ]);
   };
@@ -52,15 +89,17 @@ export default function CartItem({ cartItem }: { cartItem: CartItem }) {
     >
       <Image
         style={styles.img}
-        source={{
-          uri: "https://img.freepik.com/free-vector/tasty-fast-food-collection_1308-133072.jpg?semt=ais_hybrid&w=740&q=80",
-        }}
+        source={
+          product?.image_url
+            ? { uri: product.image_url }
+            : { uri: defaultImage }
+        }
       />
 
       {/* name */}
       <View style={{ width: 180, rowGap: 4, paddingHorizontal: 5 }}>
         <Text numberOfLines={2} style={styles.itemText}>
-          Beuasdjnjnj
+          {product?.name}
         </Text>
         <View style={GLOBAL_STYLE.row}>
           <Text style={GLOBAL_STYLE.subtitle}>Price: </Text>
