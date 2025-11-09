@@ -11,7 +11,7 @@ const User = require("../models/User");
 const listUsers = async (req, res, next) => {
   try {
     // exclude password field
-    const users = await User.find({}, "-password").sort({ createdAt: -1 });
+    const users = await User.find({_id: { $ne: req.userId }}, "-password").sort({ createdAt: -1 });
     return res.json({ success: true, data: users });
   } catch (err) {
     return next(err);

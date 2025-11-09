@@ -43,45 +43,45 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
+    <div className="flex justify-center items-center bg-gradient-to-br from-background to-muted p-4 min-h-screen">
       <div className="w-full max-w-md">
-        <div className="bg-card rounded-2xl shadow-lg p-8 border border-border">
+        <div className="bg-card shadow-lg p-8 border border-border rounded-2xl">
           <div className="flex justify-center mb-6">
-            <div className="p-3 bg-primary/10 rounded-lg">
+            <div className="bg-primary/10 p-3 rounded-lg">
               <LogIn className="w-6 h-6 text-primary" />
             </div>
           </div>
 
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-foreground">Admin Login</h1>
-            <p className="text-muted-foreground text-sm mt-2">Chỉ dành cho quản trị viên</p>
+          <div className="mb-8 text-center">
+            <h1 className="font-bold text-foreground text-2xl">Admin Login</h1>
+            <p className="mt-2 text-muted-foreground text-sm">Chỉ dành cho quản trị viên</p>
           </div>
 
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Email</label>
+              <label className="block mb-2 font-medium text-foreground text-sm">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border border-border rounded-lg px-4 py-2.5 bg-input text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="bg-input px-4 py-2.5 border border-border focus:border-primary rounded-lg outline-none focus:ring-2 focus:ring-primary/50 w-full text-foreground placeholder:text-muted-foreground transition-all"
                 placeholder="admin@example.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Mật khẩu</label>
+              <label className="block mb-2 font-medium text-foreground text-sm">Mật khẩu</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border border-border rounded-lg px-4 py-2.5 bg-input text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="bg-input px-4 py-2.5 border border-border focus:border-primary rounded-lg outline-none focus:ring-2 focus:ring-primary/50 w-full text-foreground placeholder:text-muted-foreground transition-all"
                 placeholder="••••••••"
               />
             </div>
 
-            {error ? <p className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{error}</p> : null}
+            {error ? <p className="bg-destructive/10 p-3 rounded-lg text-destructive text-sm">{error}</p> : null}
 
             <button
               type="submit"
