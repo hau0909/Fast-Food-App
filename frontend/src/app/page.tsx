@@ -7,7 +7,7 @@ import { HeaderWithSettings } from "@/components/setting"
 const NavItem = ({ href, label }: { href: string; label: string }) => (
   <Link
     href={href}
-    className="flex items-center gap-3 px-4 py-3 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground rounded-lg transition-colors"
+    className="flex items-center gap-3 hover:bg-sidebar-accent px-4 py-3 rounded-lg font-medium text-sidebar-foreground text-sm transition-colors hover:text-sidebar-accent-foreground"
   >
     {label}
   </Link>
@@ -15,34 +15,37 @@ const NavItem = ({ href, label }: { href: string; label: string }) => (
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="grid grid-cols-12 gap-0">
-        <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-sidebar border-r border-sidebar-border min-h-screen p-6 flex flex-col sticky top-0">
+    <div className="bg-background min-h-screen">
+      <div className="gap-0 grid grid-cols-12">
+        <aside className="top-0 sticky flex flex-col col-span-12 md:col-span-3 lg:col-span-2 bg-sidebar p-6 border-sidebar-border border-r min-h-screen">
           <div className="mb-8">
-            <Link href="/" className="text-xl font-bold text-sidebar-foreground">
+            <Link href="/" className="font-bold text-sidebar-foreground text-xl">
               Admin
             </Link>
-            <p className="text-xs text-sidebar-foreground/60 mt-1">Dashboard</p>
+            <p className="mt-1 text-sidebar-foreground/60 text-xs">Dashboard</p>
           </div>
           
-          <nav className="space-y-2 flex-1">
+          <nav className="flex-1 space-y-2">
             <NavItem href="/products" label="Products" />
             <NavItem href="/categories" label="Categories" />
             <NavItem href="/orders" label="Orders" />
+            <NavItem href="/users" label="Users"/>
+            <NavItem href= "/reviews" label= "Reviews" />
+            
           </nav>
-          <div className="pt-4 border-t border-sidebar-border mt-auto">
+          <div className="mt-auto pt-4 border-sidebar-border border-t">
             <HeaderWithSettings position="inline" />
           </div>
         </aside>
 
         <main className="col-span-12 md:col-span-9 lg:col-span-10 p-8">
-          <div className="max-w-7xl mx-auto">
+          <div className="mx-auto max-w-7xl">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-              <p className="text-muted-foreground mt-2">Welcome back! Here's your admin overview.</p>
+              <h1 className="font-bold text-foreground text-3xl">Dashboard</h1>
+              <p className="mt-2 text-muted-foreground">Welcome back! Here's your admin overview.</p>
             </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="gap-6 grid sm:grid-cols-2 lg:grid-cols-3">
               <DashboardCard
                 icon={Package}
                 title="Món ăn"
@@ -88,16 +91,16 @@ function DashboardCard({
   return (
     <Link
       href={href}
-      className="group block rounded-xl border border-border bg-card p-6 shadow-sm hover:shadow-md hover:border-primary/30 transition-all"
+      className="group block bg-card shadow-sm hover:shadow-md p-6 border border-border hover:border-primary/30 rounded-xl transition-all"
     >
-      <div className="flex items-start justify-between mb-4">
+      <div className="flex justify-between items-start mb-4">
         <div className={`p-3 rounded-lg ${color === "primary" ? "bg-primary/10" : "bg-accent/10"}`}>
           <Icon className={`w-6 h-6 ${color === "primary" ? "text-primary" : "text-accent"}`} />
         </div>
         <span className="text-muted-foreground group-hover:text-foreground transition-colors">→</span>
     </div>
-      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-      <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      <h2 className="font-semibold text-foreground text-lg">{title}</h2>
+      <p className="mt-2 text-muted-foreground text-sm">{description}</p>
     </Link>
   )
 }
