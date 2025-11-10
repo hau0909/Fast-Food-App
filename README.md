@@ -38,6 +38,14 @@ File `.env` chứa các thông tin nhạy cảm và sẽ không được đưa l
     # Thay thế bằng một chuỗi ký tự bí mật và phức tạp
     JWT_SECRET=your_super_secret_and_long_jwt_key
     ```
+2.  Sao chép nội dung từ file `app/.env.example` (nếu có) hoặc sử dụng mẫu dưới đây và dán vào file `backend/.env`:
+
+    ```env
+    #---------------------------------
+   exp_url: link exp khi chạy expo app
+   EXPO_PUBLIC_API_URL="exp_url":8000
+   EXPO_PUBLIC_JWT_TOKEN_SECRET=rayhan
+    ```
 
 ## 🏃 Chạy Môi trường Dev
 
