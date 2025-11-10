@@ -1,15 +1,15 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
-import { LogIn } from "lucide-react"
+import { LogIn, Eye, EyeOff } from "lucide-react"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -31,7 +31,6 @@ export default function AdminLoginPage() {
       }
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token)
-        // Notify listeners in same tab to update auth UI immediately
         window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: token }))
       }
       router.push("/")
@@ -69,16 +68,26 @@ export default function AdminLoginPage() {
                 placeholder="admin@example.com"
               />
             </div>
+
             <div>
               <label className="block mb-2 font-medium text-foreground text-sm">Mật khẩu</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="bg-input px-4 py-2.5 border border-border focus:border-primary rounded-lg outline-none focus:ring-2 focus:ring-primary/50 w-full text-foreground placeholder:text-muted-foreground transition-all"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-input px-4 py-2.5 pr-10 border border-border focus:border-primary rounded-lg outline-none focus:ring-2 focus:ring-primary/50 w-full text-foreground placeholder:text-muted-foreground transition-all"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute inset-y-0 right-3 flex items-center text-muted-foreground hover:text-foreground"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {error ? <p className="bg-destructive/10 p-3 rounded-lg text-destructive text-sm">{error}</p> : null}
@@ -95,8 +104,6 @@ export default function AdminLoginPage() {
               {isSubmitting ? "Đang đăng nhập..." : "Đăng nhập"}
             </button>
           </form>
-
-          
         </div>
       </div>
     </div>
