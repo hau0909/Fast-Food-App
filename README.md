@@ -38,7 +38,7 @@ Dự án yêu cầu **4 file `package.json` riêng biệt** (root, backend, app,
 ```env
 MONGODB_URI=mongodb://127.0.0.1:27017/fast_food_app_db
 PORT=8000
-JWT_SECRET=your_super_secret_and_long_jwt_key
+JWT_TOKEN_SECRET=your_super_secret_and_long_jwt_key
 ```
 
 ### 2️⃣ App (Expo/React Native) (`app/.env`)
