@@ -165,7 +165,26 @@ const addItemToCart = async (req, res, next) => {
   }
 };
 
+// [DELETE] /api/carts/clear
+const clearCart = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+
+    const cart = await Cart.findOne({ user_id: userId });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    await CartItem.deleteMany({ cart_id: cart._id });
+
+    return res.json({ message: "Cart cleared successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
+  clearCart,
   getUserCart,
   deleteCartItem,
   updateCartItemQuantity,

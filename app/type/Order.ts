@@ -10,6 +10,6 @@ export interface Order {
   shipping_fee: number;
   status: "pending" | "confirmed" | "shipping" | "completed" | "cancelled";
   payment_status: "unpaid" | "paid";
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
 }

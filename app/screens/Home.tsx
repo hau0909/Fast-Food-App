@@ -1,17 +1,12 @@
 import { Alert, Text, View } from "react-native";
-import { RootStackParamList } from "../type/Route";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
 import FilterBar from "../components/FilterBar";
 import { GLOBAL_STYLE } from "../styles/globalStyle";
-import Card from "../components/Card";
 import { useEffect, useState } from "react";
 import { Product } from "../type/Product";
 import { getAllProduct, ProductFilters } from "../services/productApi";
 import ProductList from "../components/ProductList";
 
 export default function Home() {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
-
   const [products, setProducts] = useState<Product[] | null>(null);
 
   useEffect(() => {
