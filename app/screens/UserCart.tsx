@@ -70,7 +70,13 @@ export default function UserCart() {
       ) : (
         <View style={[GLOBAL_STYLE.centered, { marginTop: 200, rowGap: 10 }]}>
           <Text style={styles.infoText}>Your cart is empty.</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Home")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("MainTabs", {
+                screen: "Home",
+              })
+            }
+          >
             <View style={styles.btn}>
               <Text style={styles.btnText}>Order now</Text>
             </View>
@@ -94,7 +100,13 @@ export default function UserCart() {
               { justifyContent: "space-between" },
             ]}
           >
-            <Text style={styles.btnText}>Checkout</Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Checkout", { cart: userCart })
+              }
+            >
+              <Text style={styles.btnText}>Checkout</Text>
+            </TouchableOpacity>
             <Entypo name="chevron-right" size={24} color={COLORS.white} />
           </TouchableOpacity>
         </View>

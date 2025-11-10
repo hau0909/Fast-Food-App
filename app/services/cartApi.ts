@@ -133,3 +133,38 @@ export const deleteCartItem = async (itemId: string) => {
     return { success: false, err: "Network error, please try again" };
   }
 };
+
+export const clearCart = async () => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      return { success: false, err: "Missing token" };
+    }
+
+    const url = `${API_URL}/api/carts/clear`;
+
+    const res = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        err: data?.message || "Failed to clear cart",
+      };
+    }
+
+    return {
+      success: true,
+      message: data?.message || "Cart cleared successfully",
+    };
+  } catch (error) {
+    return { success: false, err: "Network error, please try again" };
+  }
+};

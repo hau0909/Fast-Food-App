@@ -21,7 +21,7 @@ export default function Maintabs() {
         component={Home}
         options={{ header: () => <HomeHeader />, headerShown: true }}
       />
-      <Tab.Screen name="Card" component={Cart} />
+      <Tab.Screen name="Cart" component={Cart} />
       <Tab.Screen name="Profiles" component={Profiles} />
     </Tab.Navigator>
   );

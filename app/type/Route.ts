@@ -1,13 +1,19 @@
-import { Cart } from "./Cart";
-import { CartItem } from "./CartItem";
 import { Product } from "./Product";
 
 export type RootStackParamList = {
-  Maintabs: undefined;
+  Auth: undefined;
+  MainTabs:
+    | {
+        screen: keyof TabParamList;
+      }
+    | undefined;
+  Details: { product: Product };
+  Orders: any | undefined;
+  Checkout: any | undefined;
+};
+
+export type TabParamList = {
   Home: undefined;
-  Login: undefined;
-  Register: undefined;
-  Details: Product | undefined;
-  Cart: Cart | undefined;
-  Checkout: CartItem | undefined;
+  Cart: undefined;
+  Profiles: undefined;
 };

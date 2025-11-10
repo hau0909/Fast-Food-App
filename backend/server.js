@@ -45,6 +45,12 @@ async function start() {
     // cart route
     app.use("/api/carts", require("./src/routes/cartRoutes"));
 
+    // profile
+    app.use("/api/profile", require("./src/routes/profileRoutes"));
+
+    // user orders
+    app.use("/api/orders", require("./src/routes/userOrderRoutes"));
+
     //* Auth routes
     app.use("/api/auth", require("./src/routes/authRoutes"));
 

@@ -12,7 +12,7 @@ export default function Card({ product }: { product: Product }) {
 
   return (
     <View style={[styles.card, { margin: 10 }]}>
-      <TouchableOpacity onPress={() => navigation.navigate("Details")}>
+      <TouchableOpacity onPress={() => navigation.navigate("Details", product)}>
         <View style={{ rowGap: 5 }}>
           <Image
             style={GLOBAL_STYLE.image}
