@@ -1,116 +1,163 @@
+
+---
+
 # 🍔 Fast Food App (Project Team Guide)
 
 ## 📖 Tổng quan & Công nghệ
 
-Dự án này là một hệ thống đặt đồ ăn nhanh, được xây dựng theo kiến trúc monorepo.
+Dự án này là một hệ thống đặt đồ ăn nhanh, được xây dựng theo kiến trúc **monorepo**.
 
-*   **Backend:**
-    *   **Framework:** Express.js
-    *   **Database:** MongoDB với Mongoose ODM
-*   **Mobile App:**
-    *   **Framework:** React Native
-    *   **Toolkit:** Expo
-    *   **Ngôn ngữ:** TypeScript
+* **Backend:**
 
-## 📋 Yêu cầu cần 4 file `package.json` riêng biệt.
+  * **Framework:** Express.js
+  * **Database:** MongoDB với Mongoose ODM
 
-**Bước 3: Thiết lập Biến môi trường cho Backend**
-File `.env` chứa các thông tin nhạy cảm và sẽ không được đưa lên Git.
+* **Mobile App:**
 
-1.  Trong thư mục `backend`, tạo một file mới tên là `.env`.
-2.  Sao chép nội dung từ file `backend/.env.example` (nếu có) hoặc sử dụng mẫu dưới đây và dán vào file `backend/.env`:
+  * **Framework:** React Native
+  * **Toolkit:** Expo
+  * **Ngôn ngữ:** TypeScript
 
-    ```env
-    #---------------------------------
-    # MONGODB CONFIG
-    #---------------------------------
-    # Thay 'fast_food_app_db' bằng tên database của bạn
-    MONGODB_URI=mongodb://127.0.0.1:27017/fast_food_app_db
+* **Frontend (Web):**
 
-    #---------------------------------
-    # SERVER CONFIG
-    #---------------------------------
-    PORT=8000
+  * **Framework:** Next.js
+  * **Ngôn ngữ:** TypeScript
 
-    #---------------------------------
-    # JWT CONFIG
-    #---------------------------------
-    # Thay thế bằng một chuỗi ký tự bí mật và phức tạp
-    JWT_SECRET=your_super_secret_and_long_jwt_key
-    ```
-2.  Sao chép nội dung từ file `app/.env.example` (nếu có) hoặc sử dụng mẫu dưới đây và dán vào file `backend/.env`:
+---
 
-    ```env
-    #---------------------------------
-   exp_url: link exp khi chạy expo app
-   EXPO_PUBLIC_API_URL="exp_url":8000
-   EXPO_PUBLIC_JWT_TOKEN_SECRET=rayhan
-    ```
+## 📋 Yêu cầu
+
+Dự án yêu cầu **4 file `package.json` riêng biệt** (root, backend, app, frontend) để quản lý script và dependencies riêng.
+
+---
+
+## 🌱 Thiết lập Biến môi trường
+
+### 1️⃣ Backend (`backend/.env`)
+
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/fast_food_app_db
+PORT=8000
+JWT_SECRET=your_super_secret_and_long_jwt_key
+```
+
+### 2️⃣ App (Expo/React Native) (`app/.env`)
+
+> Lưu ý: `EXPO_PUBLIC_API_URL` cần cập nhật mỗi khi chạy Expo (Metro Bundler cung cấp URL mới).
+
+```env
+EXPO_PUBLIC_API_URL=http://{exp_url}:8000
+EXPO_PUBLIC_JWT_TOKEN_SECRET=abc123
+```
+
+Ví dụ khi Expo cung cấp URL `exp://192.168.1.100:19000`:
+
+```env
+EXPO_PUBLIC_API_URL=http://192.168.1.100:8000
+EXPO_PUBLIC_JWT_TOKEN_SECRET=abc123
+```
+
+### 3️⃣ Frontend (Next.js) (`frontend/.env`)
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+---
+
+## ⚡ Cài đặt Dependencies
+
+Trước khi chạy dev, **mỗi phần cần cài dependencies riêng**:
+
+### Root
+
+```bash
+cd {root_folder}
+npm install
+```
+
+### Backend
+
+```bash
+cd backend
+npm install
+```
+
+### App (Expo)
+
+```bash
+cd app
+npm install
+```
+
+### Frontend (Next.js)
+
+```bash
+cd frontend
+npm install
+```
+
+> Sau khi cài xong, trở về **root** để chạy lệnh dev đồng thời.
+
+---
 
 ## 🏃 Chạy Môi trường Dev
 
-Để bắt đầu phát triển, hãy mở một terminal duy nhất tại **thư mục gốc** của dự án và chạy:
+Tại **thư mục gốc** của dự án:
 
 ```bash
 npm run dev
 ```
 
 Lệnh này sẽ tự động:
-1.  Khởi chạy **Backend Server** tại `http://localhost:8000` với `nodemon`.
-2.  Khởi chạy **Metro Bundler** cho ứng dụng **Expo**.
 
-Sau đó, hãy quét mã QR bằng ứng dụng **Expo Go** để mở ứng dụng trên điện thoại của bạn.
+1. Khởi chạy **Backend Server** tại `http://localhost:8000` với `nodemon`.
+2. Khởi chạy **Metro Bundler** cho ứng dụng **Expo**.
+3. Nếu có frontend, khởi chạy Next.js server (nếu script dev được cấu hình).
+
+> Sau đó, quét mã QR bằng ứng dụng **Expo Go** để mở app trên điện thoại.
+
+---
 
 ## 🌿 Quy trình làm việc với Git (QUAN TRỌNG)
 
-Để đảm bảo sự ổn định của dự án và tránh xung đột, tất cả các thành viên **phải** tuân thủ quy trình sau:
+**Nguyên tắc vàng:** Không push code trực tiếp lên nhánh `main` hoặc `dev`.
 
-**Nguyên tắc vàng: Không bao giờ push code trực tiếp lên nhánh `main` hoặc `dev`.**
-
-**Bước 1: Bắt đầu một tính năng mới**
-Luôn bắt đầu từ phiên bản mới nhất của nhánh `dev`.
+### Bước 1: Bắt đầu tính năng mới
 
 ```bash
-# Chuyển sang nhánh dev
 git checkout dev
-
-# Lấy code mới nhất từ remote về
 git pull origin dev
 ```
 
-**Bước 2: Tạo nhánh tính năng (Feature Branch)**
-Tên nhánh nên rõ ràng và tuân theo quy ước: `feature/ten-tinh-nang` hoặc `fix/ten-loi`.
+### Bước 2: Tạo nhánh tính năng (Feature Branch)
 
 ```bash
-# Ví dụ: Tạo nhánh cho tính năng màn hình đăng nhập
-git checkout -b feature/login-screen
+git checkout -b feature/ten-tinh-nang
 ```
 
-**Bước 3: Lập trình và Commit thường xuyên**
-Thực hiện công việc trên nhánh mới của bạn. Hãy commit các thay đổi một cách thường xuyên với các thông điệp commit rõ ràng.
+### Bước 3: Commit thường xuyên
 
 ```bash
-# Thêm các file bạn đã thay đổi
 git add .
-
-# Viết một commit message ý nghĩa
 git commit -m "feat(auth): Xây dựng giao diện màn hình đăng nhập"
 ```
-> **Tip:** Chúng ta nên tuân theo quy ước [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) để các commit message được đồng nhất.
 
-**Bước 4: Đẩy nhánh tính năng lên Repository**
-Khi bạn đã hoàn thành hoặc muốn chia sẻ tiến độ, hãy đẩy nhánh của bạn lên GitHub.
+> Tip: Tuân theo [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+
+### Bước 4: Đẩy nhánh lên Repository
 
 ```bash
-git push origin feature/login-screen
+git push origin feature/ten-tinh-nang
 ```
 
-**Bước 5: Tạo Pull Request (PR)**
-1.  Truy cập repository trên GitHub.
-2.  Bạn sẽ thấy một thông báo để tạo **Pull Request** từ nhánh của bạn.
-3.  Tạo PR với **nhánh đích là `dev`**.
-4.  Điền mô tả chi tiết cho PR và tag các thành viên khác vào để **review code**.
-5.  Sau khi PR được duyệt và không có conflict, người tạo PR hoặc quản lý sẽ merge nó vào nhánh `dev`.
+### Bước 5: Tạo Pull Request (PR)
+
+1. Truy cập repository trên GitHub.
+2. Tạo PR từ nhánh của bạn với **nhánh đích là `dev`**.
+3. Điền mô tả chi tiết, tag reviewer, merge sau khi được duyệt.
+
+---
 
 ## 📂 Cấu trúc Dự án
 
@@ -118,12 +165,28 @@ git push origin feature/login-screen
 /
 ├── app/          # Mã nguồn ứng dụng Expo/React Native
 ├── backend/      # Mã nguồn server Express.js
+├── frontend/     # (Nếu có) Next.js
 ├── .gitignore
-├── package.json  # Script để chạy đồng thời backend và app
+├── package.json  # Script root chạy backend + app (+ frontend nếu có)
 └── README.md
 ```
 
+---
+
 ## ✍️ Tiêu chuẩn Code
 
-*   **Code Formatter:** Dự án sử dụng [Prettier](https://prettier.io/) để đảm bảo code style nhất quán. Hãy chắc chắn bạn đã cài đặt extension Prettier trên editor của mình và bật "Format on Save".
-*   **Linter:** [ESLint](https://eslint.org/) được sử dụng để phát hiện các vấn đề và lỗi tiềm ẩn trong code. Vui lòng giải quyết tất cả các cảnh báo của ESLint trước khi tạo Pull Request.
+* **Code Formatter:** [Prettier](https://prettier.io/) → bật "Format on Save".
+* **Linter:** [ESLint](https://eslint.org/) → giải quyết tất cả cảnh báo trước khi PR.
+
+---
+
+## 🔹 Lưu ý quan trọng
+
+1. `.env` **không được push lên Git**.
+2. Cập nhật URL Expo (`EXPO_PUBLIC_API_URL`) theo địa chỉ local hoặc network mỗi lần chạy.
+3. Đặt tên biến môi trường thống nhất giữa app & frontend (`API_URL`) để dễ quản lý.
+4. Luôn pull nhánh `dev` mới nhất trước khi bắt đầu tính năng mới.
+
+---
+
+Bạn có muốn mình làm luôn không?
