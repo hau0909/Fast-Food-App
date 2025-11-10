@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Package, Layers, ShoppingCart } from "lucide-react"
+import { Package, Layers, ShoppingCart, Users, Star} from "lucide-react"
 import { HeaderWithSettings } from "@/components/setting"
 
 const NavItem = ({ href, label }: { href: string; label: string }) => (
@@ -48,8 +48,8 @@ export default function Home() {
             <div className="gap-6 grid sm:grid-cols-2 lg:grid-cols-3">
               <DashboardCard
                 icon={Package}
-                title="Món ăn"
-                description="Quản lý các món ăn và menu"
+                title="Products"
+                description="Manage dishes and menus"
                 href="/products"
                 color="primary"
               />
@@ -58,13 +58,27 @@ export default function Home() {
                 title="Categories"
                 description="Organize product categories"
                 href="/categories"
-                color="accent"
+                color="primary"
               />
               <DashboardCard
                 icon={ShoppingCart}
                 title="Orders"
                 description="View and update orders"
                 href="/orders"
+                color="primary"
+              />
+              <DashboardCard
+                icon={Users}
+                title="Users"
+                description="View and update orders"
+                href="/users"
+                color="primary"
+              />
+              <DashboardCard
+                icon={Star}
+                title="Reviews"
+                description="View and update orders"
+                href="/reviews"
                 color="primary"
               />
             </div>

@@ -282,7 +282,7 @@ export default function AdminProductsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {toast && (
         <div
           className={`fixed bottom-6 right-6 z-50 rounded-md px-5 py-3 shadow-lg border text-sm font-medium min-w-[300px] max-w-md ${
@@ -294,9 +294,9 @@ export default function AdminProductsPage() {
           {toast.message}
         </div>
       )}
-      <div className="grid grid-cols-12 gap-0">
+      <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className="col-span-12 md:col-span-3 lg:col-span-2 bg-sidebar border-r border-sidebar-border min-h-screen p-6 flex flex-col sticky top-0">
+        <aside className="w-full md:w-64 lg:w-64 bg-sidebar border-r border-sidebar-border min-h-screen p-6 flex flex-col sticky top-0 z-20">
           <div className="mb-8">
             <Link href="/" className="text-xl font-bold text-sidebar-foreground">
               Admin
@@ -307,6 +307,8 @@ export default function AdminProductsPage() {
             <NavItem href="/products" label="Products" />
             <NavItem href="/categories" label="Categories" />
             <NavItem href="/orders" label="Orders" />
+            <NavItem href="/users" label="Users" />
+            <NavItem href="/reviews" label="Reviews" />
           </nav>
           <div className="pt-4 border-t border-sidebar-border mt-auto">
             <Link
@@ -319,280 +321,308 @@ export default function AdminProductsPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="col-span-12 md:col-span-9 lg:col-span-10 p-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-primary/10 rounded-lg">
-                    <Package className="w-5 h-5 text-primary" />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 p-8 overflow-hidden">
+            <div className="max-w-7xl mx-auto w-full h-full flex flex-col">
+              {/* Sticky Header */}
+              <div className="bg-background border-b border-border sticky top-0 z-10 p-4 md:p-8 mb-0">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Package className="w-5 h-5 text-primary" />
+                      </div>
+                      <h1 className="text-3xl font-bold text-foreground">Món ăn</h1>
+                    </div>
+                    <p className="text-muted-foreground">Quản lý danh sách món ăn của bạn</p>
                   </div>
-                  <h1 className="text-3xl font-bold text-foreground">Món ăn</h1>
-                </div>
-                <p className="text-muted-foreground">Quản lý danh sách món ăn của bạn</p>
-              </div>
-              <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-                <DialogTrigger asChild>
-                  <Button onClick={openCreateDialog} className="gap-2">
-                    <Plus className="w-4 h-4" />
-                    Thêm món ăn
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>{editingProduct ? "Sửa món ăn" : "Thêm món ăn mới"}</DialogTitle>
-                  </DialogHeader>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Tên món ăn *</label>
-                      <Input
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Nhập tên món ăn"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Mô tả món</label>
-                      <textarea
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        placeholder="Nhập mô tả món ăn"
-                        className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground"
-                        rows={3}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-sm font-medium text-foreground">Giá gốc (VND) *</label>
-                        <Input
-                          type="number"
-                          step={10000}
-                          value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                          placeholder="0"
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <label className="text-sm font-medium text-foreground">Giá khuyến mãi</label>
-                        <Input
-                          type="number"
-                          step={10000}
-                          value={formData.discount_price}
-                          onChange={(e) => setFormData({ ...formData, discount_price: e.target.value })}
-                          placeholder="Không cần nhập nếu cần"
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Calories</label>
-                      <Input
-                        type="number"
-                        step={10}
-                        value={formData.calories}
-                        onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
-                        placeholder="Không cần nhập nếu cần"
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Ảnh món ăn</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground cursor-pointer"
-                      />
-                      {imagePreview && (
-                        <div className="mt-3 relative">
-                          <img
-                            src={imagePreview || "/placeholder.svg"}
-                            alt="Preview"
-                            className="w-full h-32 object-cover rounded-md border border-input"
+                  <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+                    <DialogTrigger asChild>
+                      <Button onClick={openCreateDialog} className="gap-2">
+                        <Plus className="w-4 h-4" />
+                        Thêm món ăn
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle>{editingProduct ? "Sửa món ăn" : "Thêm món ăn mới"}</DialogTitle>
+                      </DialogHeader>
+                      <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Tên món ăn *</label>
+                          <Input
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="Nhập tên món ăn"
+                            className="mt-1"
                           />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setImagePreview("")
-                              setFormData((prev) => ({ ...prev, image_url: "", image_file: undefined }))
-                            }}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
-                          >
-                            ✕
-                          </button>
                         </div>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Loại món ăn</label>
-                      <select
-                        value={formData.category_id}
-                        onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
-                        className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground"
-                      >
-                        <option value="">Chọn category</option>
-                        {categories.map((cat) => (
-                          <option key={cat._id} value={cat._id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-foreground">Trạng thái</label>
-                      <select
-                        value={formData.is_available ? "true" : "false"}
-                        onChange={(e) => setFormData({ ...formData, is_available: e.target.value === "true" })}
-                        disabled={!editingProduct}
-                        className={`mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground ${
-                          !editingProduct ? "opacity-60 cursor-not-allowed" : ""
-                        }`}
-                      >
-                        <option value="true">Còn hàng</option>
-                        <option value="false">Hết hàng</option>
-                      </select>
-                      {!editingProduct && (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          Chỉ có thể thay đổi khi sửa món ăn
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex gap-2 pt-4">
-                      <Button type="button" variant="outline" onClick={() => setOpenDialog(false)} className="flex-1">
-                        Hủy
-                      </Button>
-                      <Button type="submit" disabled={isSubmitting} className="flex-1">
-                        {isSubmitting ? "Đang xử lý..." : editingProduct ? "Cập nhật" : "Thêm"}
-                      </Button>
-                    </div>
-                  </form>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            {loading ? (
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
-                  <p className="text-muted-foreground">Đang tải...</p>
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Mô tả món</label>
+                          <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            placeholder="Nhập mô tả món ăn"
+                            className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground"
+                            rows={3}
+                          />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-foreground">Giá gốc ($) *</label>
+                            <Input
+                              type="number"
+                              step={10}
+                              min={0}
+                              value={formData.price}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const numValue = parseFloat(value);
+                                if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                  setFormData({ ...formData, price: value });
+                                }
+                              }}
+                              placeholder="0"
+                              className="mt-1"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-foreground">Giá khuyến mãi ($)</label>
+                            <Input
+                              type="number"
+                              step={10}
+                              min={0}
+                              value={formData.discount_price}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                const numValue = parseFloat(value);
+                                if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                  setFormData({ ...formData, discount_price: value });
+                                }
+                              }}
+                              placeholder="Không cần nhập nếu cần"
+                              className="mt-1"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Calories</label>
+                          <Input
+                            type="number"
+                            step={10}
+                            min={0}
+                            value={formData.calories}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const numValue = parseFloat(value);
+                              if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                setFormData({ ...formData, calories: value });
+                              }
+                            }}
+                            placeholder="Không cần nhập nếu cần"
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Ảnh món ăn</label>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground cursor-pointer"
+                          />
+                          {imagePreview && (
+                            <div className="mt-3 relative">
+                              <img
+                                src={imagePreview || "/placeholder.svg"}
+                                alt="Preview"
+                                className="w-full h-32 object-cover rounded-md border border-input"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setImagePreview("")
+                                  setFormData((prev) => ({ ...prev, image_url: "", image_file: undefined }))
+                                }}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Loại món ăn</label>
+                          <select
+                            value={formData.category_id}
+                            onChange={(e) => setFormData({ ...formData, category_id: e.target.value })}
+                            className="mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground"
+                          >
+                            <option value="">Chọn category</option>
+                            {categories.map((cat) => (
+                              <option key={cat._id} value={cat._id}>
+                                {cat.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-foreground">Trạng thái</label>
+                          <select
+                            value={formData.is_available ? "true" : "false"}
+                            onChange={(e) => setFormData({ ...formData, is_available: e.target.value === "true" })}
+                            disabled={!editingProduct}
+                            className={`mt-1 w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground ${
+                              !editingProduct ? "opacity-60 cursor-not-allowed" : ""
+                            }`}
+                          >
+                            <option value="true">Còn hàng</option>
+                            <option value="false">Hết hàng</option>
+                          </select>
+                          {!editingProduct && (
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              Chỉ có thể thay đổi khi sửa món ăn
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 pt-4">
+                          <Button type="button" variant="outline" onClick={() => setOpenDialog(false)} className="flex-1">
+                            Hủy
+                          </Button>
+                          <Button type="submit" disabled={isSubmitting} className="flex-1">
+                            {isSubmitting ? "Đang xử lý..." : editingProduct ? "Cập nhật" : "Thêm"}
+                          </Button>
+                        </div>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </div>
-            ) : error ? (
-              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
-                {error}
-              </div>
-            ) : items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 bg-card rounded-lg border border-border">
-                <Package className="w-12 h-12 text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground">Chưa có món ăn nào</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {items.map((product) => (
-                  <div
-                    key={product._id}
-                    className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col"
-                  >
-                    {/* Product Image */}
-                    <div className="relative w-full aspect-[4/3] bg-muted overflow-hidden">
-                      {product.image_url ? (
-                        <img
-                          src={buildImageUrl(product.image_url) || "/placeholder.svg"}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-8 h-8 text-muted-foreground/50" />
-                        </div>
-                      )}
-                      {product.discount_price && (
-                        <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                          Sale
-                        </div>
-                      )}
-                      {!product.is_available && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-white text-sm font-medium">Không có hàng</span>
-                        </div>
-                      )}
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto p-4 md:p-8">
+                {loading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="text-center">
+                      <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-2"></div>
+                      <p className="text-muted-foreground">Đang tải...</p>
                     </div>
+                  </div>
+                ) : error ? (
+                  <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive">
+                    {error}
+                  </div>
+                ) : items.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-12 bg-card rounded-lg border border-border">
+                    <Package className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                    <p className="text-muted-foreground">Chưa có món ăn nào</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {items.map((product) => (
+                      <div
+                        key={product._id}
+                        className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+                      >
+                        {/* Product Image */}
+                        <div className="relative w-full aspect-[4/3] bg-muted overflow-hidden">
+                          {product.image_url ? (
+                            <img
+                              src={buildImageUrl(product.image_url) || "/placeholder.svg"}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Package className="w-8 h-8 text-muted-foreground/50" />
+                            </div>
+                          )}
+                          {product.discount_price && (
+                            <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
+                              Sale
+                            </div>
+                          )}
+                          {!product.is_available && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <span className="text-white text-sm font-medium">Không có hàng</span>
+                            </div>
+                          )}
+                        </div>
 
-                    {/* Product Info */}
-                    <div className="p-4 flex-1 flex flex-col">
-                      <h3 className="font-semibold text-foreground mb-2 line-clamp-2">{product.name}</h3>
+                        {/* Product Info */}
+                        <div className="p-4 flex-1 flex flex-col">
+                          <h3 className="font-semibold text-foreground mb-2 line-clamp-2">{product.name}</h3>
 
-                      {/* Price */}
-                      <div className="mb-3">
-                        {product.discount_price ? (
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg font-bold text-red-600">
-                              {product.discount_price.toLocaleString()}₫
-                            </span>
-                            <span className="text-sm text-muted-foreground line-through">
-                              {product.price.toLocaleString()}₫
+                          {/* Price */}
+                          <div className="mb-3">
+                            {product.discount_price ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold text-red-600">
+                                  ${product.discount_price.toLocaleString()}
+                                </span>
+                                <span className="text-sm text-muted-foreground line-through">
+                                  ${product.price.toLocaleString()}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-lg font-bold text-foreground">${product.price.toLocaleString()}</span>
+                            )}
+                          </div>
+
+                          {/* Details */}
+                          <div className="space-y-1 mb-4 text-sm text-muted-foreground">
+                            {product.calories && <p>Calories: {product.calories}</p>}
+                            {product.category_id && (
+                              <p className="truncate">
+                                Category:{" "}
+                                {typeof product.category_id === "string" ? product.category_id : product.category_id?.name}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Status Badge */}
+                          <div className="mb-4">
+                            <span
+                              className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                                product.is_available ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-700"
+                              }`}
+                            >
+                              {product.is_available ? "Còn hàng" : "Hết hàng"}
                             </span>
                           </div>
-                        ) : (
-                          <span className="text-lg font-bold text-foreground">{product.price.toLocaleString()}₫</span>
-                        )}
-                      </div>
 
-                      {/* Details */}
-                      <div className="space-y-1 mb-4 text-sm text-muted-foreground">
-                        {product.calories && <p>Calories: {product.calories}</p>}
-                        {product.category_id && (
-                          <p className="truncate">
-                            Category:{" "}
-                            {typeof product.category_id === "string" ? product.category_id : product.category_id?.name}
-                          </p>
-                        )}
+                          {/* Actions */}
+                          <div className="flex gap-2 mt-auto">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openEditDialog(product)}
+                              disabled={isSubmitting}
+                              className="flex-1 gap-1"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                              Sửa
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDelete(product._id)}
+                              disabled={isSubmitting}
+                              className="flex-1 gap-1 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                              Xóa
+                            </Button>
+                          </div>
+                        </div>
                       </div>
-
-                      {/* Status Badge */}
-                      <div className="mb-4">
-                        <span
-                          className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                            product.is_available ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-700"
-                          }`}
-                        >
-                          {product.is_available ? "Còn hàng" : "Hết hàng"}
-                        </span>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex gap-2 mt-auto">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openEditDialog(product)}
-                          disabled={isSubmitting}
-                          className="flex-1 gap-1"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                          Sửa
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleDelete(product._id)}
-                          disabled={isSubmitting}
-                          className="flex-1 gap-1 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                          Xóa
-                        </Button>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )
