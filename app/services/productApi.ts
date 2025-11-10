@@ -60,3 +60,47 @@ export const getAllProduct = async (filters: ProductFilters = {}) => {
     };
   }
 };
+
+export const getProductById = async (productId: string) => {
+  try {
+    const token = await AsyncStorage.getItem("token");
+    if (!token) {
+      return { success: false, err: "Missing token" };
+    }
+
+    // Kiểm tra xem productId có được cung cấp hay không
+    if (!productId) {
+      return { success: false, err: "Product ID is required" };
+    }
+
+    const url = `${API_URL}/api/products/${productId}`;
+    // console.log("Get Product By ID URL:", url);
+
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      return {
+        success: false,
+        err: data?.message || `Failed to fetch product with ID ${productId}`,
+      };
+    }
+
+    return {
+      success: true,
+      data: data, // Dữ liệu sản phẩm
+    };
+  } catch (error) {
+    return {
+      success: false,
+      err: "Network error, please try again",
+    };
+  }
+};

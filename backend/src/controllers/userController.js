@@ -1,6 +1,5 @@
 const User = require("../models/User");
 
-
 /**
  * Admin controllers section:
  * - view user list
@@ -31,7 +30,10 @@ const updateUserRole = async (req, res, next) => {
       { role },
       { new: true, fields: "-password" }
     );
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     return res.json({ success: true, data: user });
   } catch (err) {
     return next(err);

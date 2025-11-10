@@ -6,7 +6,7 @@ import { COLORS } from "../styles/colors"; // đường dẫn có thể chỉnh 
 export default function TabBar({ state, navigation }: BottomTabBarProps) {
   const icons = {
     Home: "home",
-    Card: "cart",
+    Cart: "cart",
     Profiles: "person",
   };
 

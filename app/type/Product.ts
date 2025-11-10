@@ -7,7 +7,7 @@ export interface Product {
   price: number;
   discount_price?: number | null;
   image_url: string;
-  category: Category | string; // đã populate từ category_id
+  category_id: Category | string;
   is_available: boolean;
   createdAt?: string;
   updatedAt?: string;

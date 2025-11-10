@@ -1,10 +1,9 @@
 import { Order } from "./Order";
-import type { Product } from "./Product";
 
 export interface OrderItem {
   _id: string;
-  order: Order | string; // populate hay không tuỳ API
-  product: Product | string;
+  order_id: string; // populate hay không tuỳ API
+  product_id: string;
   quantity: number;
   price: number;
 }
