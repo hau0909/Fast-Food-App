@@ -1,9 +1,11 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import axios from "axios"
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js'
 import { Line } from 'react-chartjs-2'
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
 
@@ -12,31 +14,38 @@ export default function DashboardGraph() {
   const [reports, setReports] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [generateOpen, setGenerateOpen] = useState(false)
+  const [generating, setGenerating] = useState(false)
+  const [generateStatus, setGenerateStatus] = useState<string | null>(null)
+
+  const fetchReports = useCallback(async (limit = days) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") || undefined : undefined
+      const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard?limit=${limit}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+        withCredentials: true,
+      })
+      const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
+      setReports(list)
+    } catch (e: any) {
+      setError(e?.response?.data?.message || "Failed to load reports")
+    } finally {
+      setLoading(false)
+    }
+  }, [days])
 
   useEffect(() => {
     let mounted = true
-    async function load() {
-      setLoading(true)
-      setError(null)
-      try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("token") || undefined : undefined
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard?limit=${days}`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          withCredentials: true,
-        })
-        const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []
-        if (mounted) setReports(list)
-      } catch (e: any) {
-        if (mounted) setError(e?.response?.data?.message || "Failed to load reports")
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-    load()
+    ;(async () => {
+      if (!mounted) return
+      await fetchReports(days)
+    })()
     return () => {
       mounted = false
     }
-  }, [days])
+  }, [days, fetchReports])
 
   const prepare = (list: any[]) => {
     const chronological = [...list].reverse()
@@ -53,6 +62,21 @@ export default function DashboardGraph() {
   }
 
   const { labels, orders, revenue } = prepare(reports)
+
+  // aggregate top_products across the fetched reports to display an overall top list
+  const aggregatedTopProducts = (() => {
+    const map = new Map<string, { product_id: string; name: string; total_sold: number }>()
+    for (const r of reports) {
+      const tops = Array.isArray(r.top_products) ? r.top_products : []
+      for (const p of tops) {
+        const id = p.product_id || p._id || String(p.name)
+        const existing = map.get(id) ?? { product_id: id, name: p.name || "Unknown", total_sold: 0 }
+        existing.total_sold += Number(p.total_sold ?? 0)
+        map.set(id, existing)
+      }
+    }
+    return Array.from(map.values()).sort((a, b) => b.total_sold - a.total_sold)
+  })()
 
   const chartData: any = {
     labels,
@@ -170,6 +194,84 @@ export default function DashboardGraph() {
             <option value="20">20 days</option>
             <option value="50">50 days</option>
           </select>
+          <Dialog open={generateOpen} onOpenChange={(v) => setGenerateOpen(v)}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" disabled={generating}>Generate</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogTitle>Generate dashboard reports</DialogTitle>
+              <DialogDescription>
+                Generate dashboard statistics for either the dates currently shown, or for all available dates on the server. Generating all dates can take a long time and uses only the orders already in the system.
+              </DialogDescription>
+              <div className="space-y-3 mt-3">
+                <div className="text-sm">
+                  <strong>Visible range:</strong> Generate statistics for the dates currently shown ({reports.length} day(s)). This updates data only for these dates.
+                </div>
+                <div className="text-sm">
+                  <strong>Generate all:</strong> Ask the server to generate statistics for all dates. This may take a while; the server will process using the orders it currently has.
+                </div>
+                {generateStatus && (
+                  <div className="mt-2 text-muted-foreground text-xs">{generateStatus}</div>
+                )}
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="ghost" size="sm" disabled={generating}>Cancel</Button>
+                </DialogClose>
+                <Button variant="outline" size="sm" disabled={generating || !reports.length} onClick={async () => {
+                  // generate for visible range (send array of dates in one request)
+                  setGenerating(true)
+                  setGenerateStatus(null)
+                  try {
+                    const token = typeof window !== "undefined" ? localStorage.getItem("token") || undefined : undefined
+                    // unique dates from reports (YYYY-MM-DD)
+                    const uniqueDates = Array.from(new Set(reports.map((r) => {
+                      try { return new Date(r.report_date).toISOString().slice(0,10) } catch { return String(r.report_date) }
+                    })))
+                    if (uniqueDates.length === 0) {
+                      setGenerateStatus('No dates available to generate')
+                      setGenerating(false)
+                      return
+                    }
+                    setGenerateStatus(`Generating ${uniqueDates.length} date(s)...`)
+                    // send all dates in a single request (backend supports array or comma-separated string)
+                    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard/generate`, { date: uniqueDates }, {
+                      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                      withCredentials: true,
+                    })
+                    setGenerateStatus('Done. Refreshing data...')
+                    await fetchReports(days)
+                    setTimeout(() => setGenerateOpen(false), 600)
+                  } catch (e: any) {
+                    setGenerateStatus(e?.response?.data?.message || 'Generate failed')
+                  } finally {
+                    setGenerating(false)
+                  }
+                }}>Generate visible</Button>
+                <Button variant="destructive" size="sm" disabled={generating} onClick={async () => {
+                  // generate all
+                  setGenerating(true)
+                  setGenerateStatus(null)
+                  try {
+                    const token = typeof window !== "undefined" ? localStorage.getItem("token") || undefined : undefined
+                    setGenerateStatus('Requesting server to generate all reports...')
+                    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/dashboard/generate`, { all: true }, {
+                      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                      withCredentials: true,
+                    })
+                    setGenerateStatus('Request accepted. The server is processing the full generation; statistics will be available when it finishes.')
+                    // refresh after short delay — server may take longer; still attempt
+                    await fetchReports(days)
+                    setTimeout(() => setGenerateOpen(false), 600)
+                  } catch (e: any) {
+                    setGenerateStatus(e?.response?.data?.message || 'Generate all failed')
+                  } finally {
+                    setGenerating(false)
+                  }
+                }}>Generate all</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -184,6 +286,24 @@ export default function DashboardGraph() {
           <div className="w-full h-40">
             <Line data={chartData} options={options} />
           </div>
+            {/* aggregated top products list */}
+            <div className="mt-4">
+              <h4 className="font-medium text-foreground text-sm">Top products (last {days} days)</h4>
+              {aggregatedTopProducts.length === 0 ? (
+                <div className="mt-2 text-muted-foreground text-xs">No top products available</div>
+              ) : (
+                <ul className="mt-2 divide-y">
+                  {aggregatedTopProducts.slice(0, 10).map((p, i) => (
+                    <li key={p.product_id} className="flex justify-between items-center py-2">
+                      <div>
+                        <div className="font-medium">{i + 1}. {p.name}</div>
+                      </div>
+                      <div className="font-semibold text-sm">{p.total_sold}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
         </div>
       )}
     </div>

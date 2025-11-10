@@ -23,7 +23,7 @@ const generateReport = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Forbidden' });
     }
 
-    const { date, all } = req.body || {};
+  const { date, all } = req.body || {};
 
     if (all) {
       // get unique dates from orders (YYYY-MM-DD)
@@ -47,10 +47,27 @@ const generateReport = async (req, res, next) => {
     }
 
     if (date) {
-      const parsed = new Date(date);
-      if (isNaN(parsed.getTime())) return res.status(400).json({ success: false, message: 'Invalid date' });
-      const saved = await computeAndSaveReport(parsed);
-      return res.json({ success: true, data: saved });
+      // support single date string, array of dates, or comma-separated list
+      const dateValues = Array.isArray(date) ? date : String(date).split(',').map((s) => s.trim()).filter(Boolean);
+      if (!dateValues.length) return res.status(400).json({ success: false, message: 'Invalid date' });
+
+      // if single date, return the saved report object (backwards compatible)
+      if (dateValues.length === 1) {
+        const parsed = new Date(dateValues[0]);
+        if (isNaN(parsed.getTime())) return res.status(400).json({ success: false, message: 'Invalid date' });
+        const saved = await computeAndSaveReport(parsed);
+        return res.json({ success: true, data: saved });
+      }
+
+      // multiple dates: compute sequentially and return summary results
+      const results = [];
+      for (const d of dateValues) {
+        const parsed = new Date(d);
+        if (isNaN(parsed.getTime())) return res.status(400).json({ success: false, message: `Invalid date: ${d}` });
+        const saved = await computeAndSaveReport(parsed);
+        results.push({ date: d, id: saved ? saved._id : null });
+      }
+      return res.json({ success: true, count: results.length, results });
     }
 
     return res.status(400).json({ success: false, message: 'Provide { date } or { all: true } in body' });
