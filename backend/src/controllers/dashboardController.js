@@ -146,19 +146,56 @@ const getDashboardReport = async (req, res, next) => {
       return res.status(403).json({ success: false, message: "Forbidden" });
     }
 
-    // target the previous UTC day (yesterday)
+    // Support query params:
+    // - ?date=YYYY-MM-DD  -> return (and compute if missing) that day's report
+    // - ?limit=N          -> return latest N reports (newest-first)
+    // If no date provided, ensure yesterday's report exists (compute if missing)
+    const { date, limit } = req.query || {};
+    const force = req.query && req.query.force === 'true';
+
+    // If a specific date is requested, return that single report (compute if missing)
+    if (date) {
+      const parsed = new Date(date);
+      if (isNaN(parsed.getTime())) return res.status(400).json({ success: false, message: 'Invalid date' });
+      const start = startOfDay(parsed);
+      const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+      let report = await DashboardStats.findOne({ report_date: { $gte: start, $lt: end } });
+      if (!report || force) {
+        try {
+          await computeAndSaveReport(start);
+          report = await DashboardStats.findOne({ report_date: { $gte: start, $lt: end } });
+        } catch (err) {
+          // if compute fails, return error
+          return next(err);
+        }
+      }
+      return res.json({ success: true, data: report });
+    }
+
+    // No specific date: ensure yesterday exists (compute if missing or forced)
     const yesterdayStart = startOfDay(new Date(Date.now() - 24 * 60 * 60 * 1000));
     const yesterdayEnd = new Date(yesterdayStart.getTime() + 24 * 60 * 60 * 1000);
-
     const existing = await DashboardStats.findOne({ report_date: { $gte: yesterdayStart, $lt: yesterdayEnd } });
+    if (!existing || force) {
+      try {
+        await computeAndSaveReport(yesterdayStart);
+      } catch (err) {
+        // Log and continue to still return existing reports if compute fails
+        // eslint-disable-next-line no-console
+        console.error('Failed to compute yesterday dashboard report:', err);
+      }
+    }
 
-    // allow forcing a fresh compute via query ?force=true
-    const force = req.query && req.query.force === 'true';
-    if (existing && !force) return res.json({ success: true, data: existing });
-
-    // Compute and persist yesterday's report now (missing or forced)
-    const saved = await computeAndSaveReport(yesterdayStart);
-    return res.json({ success: true, data: saved });
+    // Fetch reports, apply optional limit
+    const q = DashboardStats.find().sort({ report_date: -1 });
+    if (limit) {
+      const n = parseInt(limit, 10);
+      if (Number.isNaN(n) || n <= 0) return res.status(400).json({ success: false, message: 'Invalid limit' });
+      q.limit(n);
+    }
+    const reports = await q;
+    return res.json({ success: true, data: reports });
   } catch (err) {
     return next(err);
   }

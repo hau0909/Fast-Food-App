@@ -5,7 +5,7 @@ import type React from "react"
 import { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import Link from "next/link"
-import { Users, UserCheck, UserX } from "lucide-react"
+import { Users, UserCheck, UserX, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -37,6 +37,8 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedForDelete, setSelectedForDelete] = useState<User | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [openDialog, setOpenDialog] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [selectedRole, setSelectedRole] = useState<"user" | "admin">("user")
@@ -126,6 +128,27 @@ export default function AdminUsersPage() {
       alert(e?.response?.data?.message || "Cập nhật thất bại")
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteUser = async (id?: string) => {
+    if (!id) return
+    // disable per-id
+    setDeletingId(id)
+    try {
+      const token = getToken()
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/users/${id}`, {
+        withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      })
+      // remove from list
+      setUsers((prev) => prev.filter((u) => u._id !== id))
+      setSelectedForDelete(null)
+      showToast("Đã xóa người dùng")
+    } catch (e: any) {
+      showToast(e?.response?.data?.message || "Xóa thất bại", "error")
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -235,6 +258,24 @@ export default function AdminUsersPage() {
                       </span>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => openEditDialog(user)} className="gap-1">Change role</Button>
+
+                        <Dialog open={!!selectedForDelete && selectedForDelete._id === user._id} onOpenChange={(open) => !open && setSelectedForDelete(null)}>
+                          <DialogTrigger asChild>
+                            <Button variant="destructive" size="sm" onClick={() => setSelectedForDelete(user)} className="gap-1">
+                              <Trash2 className="w-4 h-4" /> Delete
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Xác nhận xóa người dùng</DialogTitle>
+                            </DialogHeader>
+                            <p className="text-muted-foreground text-sm">Bạn có chắc muốn xóa người dùng <strong>{selectedForDelete?.full_name ?? selectedForDelete?.username ?? selectedForDelete?.email}</strong>? Hành động này không thể hoàn tác.</p>
+                            <div className="flex gap-2 pt-4">
+                              <Button variant="outline" onClick={() => setSelectedForDelete(null)} className="flex-1">Hủy</Button>
+                              <Button variant="destructive" onClick={() => handleDeleteUser(selectedForDelete?._id)} className="flex-1" disabled={!!deletingId}>{deletingId ? "Đang xóa..." : "Xóa"}</Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </div>
                   </div>
