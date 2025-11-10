@@ -29,10 +29,11 @@ async function start() {
 
     app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-    // Admin routes (mount)
-    app.use("/api/admin/reviews", require("./src/routes/reviewRoute"));
-    app.use("/api/admin/users", require("./src/routes/userRoute"));
-    app.use("/api/admin/categories", categoryRoutes);
+  // Admin routes (mount)
+  app.use("/api/admin/reviews", require("./src/routes/reviewRoute"));
+  app.use("/api/admin/users", require("./src/routes/userRoute"));
+  app.use("/api/admin/dashboard", require("./src/routes/dashboardRoute"));
+  app.use("/api/admin/categories", categoryRoutes);
     app.use("/api/admin/products", productRoutes);
     app.use("/api/admin/orders", orderRoutes);
 

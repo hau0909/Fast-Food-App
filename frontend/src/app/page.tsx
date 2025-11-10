@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Package, Layers, ShoppingCart, Users, Star} from "lucide-react"
+import { Package, Layers, ShoppingCart, Users, Star } from "lucide-react"
+import DashboardGraph from "@/components/DashboardGraph"
 import { HeaderWithSettings } from "@/components/setting"
 
 const NavItem = ({ href, label }: { href: string; label: string }) => (
@@ -43,6 +44,10 @@ export default function Home() {
             <div className="mb-8">
               <h1 className="font-bold text-foreground text-3xl">Dashboard</h1>
               <p className="mt-2 text-muted-foreground">Welcome back! Here's your admin overview.</p>
+            </div>
+
+            <div className="mb-6">
+              <DashboardGraph />
             </div>
 
             <div className="gap-6 grid sm:grid-cols-2 lg:grid-cols-3">

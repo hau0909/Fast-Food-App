@@ -40,6 +40,25 @@ const updateUserRole = async (req, res, next) => {
   }
 };
 
+// Delete user (admin)
+const deleteUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+
+    // Prevent admin from deleting themselves by accident
+    if (userId === req.userId) {
+      return res.status(400).json({ success: false, message: "Cannot delete current logged-in user" });
+    }
+
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    return res.json({ success: true, message: "User deleted" });
+  } catch (err) {
+    return next(err);
+  }
+};
+
 /**
  * END Admin controllers section
  */
@@ -47,4 +66,5 @@ const updateUserRole = async (req, res, next) => {
 module.exports = {
   listUsers,
   updateUserRole,
+  deleteUser,
 };
