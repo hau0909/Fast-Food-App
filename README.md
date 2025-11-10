@@ -189,4 +189,3 @@ git push origin feature/ten-tinh-nang
 
 ---
 
-Bạn có muốn mình làm luôn không?
