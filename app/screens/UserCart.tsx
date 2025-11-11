@@ -40,7 +40,6 @@ export default function UserCart() {
         setUserCart(res.data);
       } else {
         setUserCart(null);
-        console.error("Failed to load cart:", res.err);
       }
     } catch (error) {
       console.error("Network error:", error);

@@ -86,6 +86,12 @@ export default function Register() {
     if (!phoneNumber.trim()) {
       newErr.phoneNumber = "Please enter your phone number.";
       hasError = true;
+    } else if (!/^[0-9]+$/.test(phoneNumber)) {
+      newErr.phoneNumber = "Phone number must contain only digits.";
+      hasError = true;
+    } else if (phoneNumber.length < 9 || phoneNumber.length > 11) {
+      newErr.phoneNumber = "Phone number must be between 9 and 11 digits.";
+      hasError = true;
     }
 
     if (!address.trim()) {

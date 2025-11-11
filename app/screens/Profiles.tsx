@@ -45,12 +45,31 @@ export default function ProfileScreen() {
 
   // Cập nhật thông tin người dùng
   const handleSave = async () => {
+    // ✅ Kiểm tra rỗng
+    if (!fullName.trim() || !phone.trim() || !address.trim()) {
+      return Alert.alert("Error", "Please fill in all fields!");
+    }
+
+    // ✅ Kiểm tra số điện thoại: chỉ chứa ký tự số
+    if (!/^[0-9]+$/.test(phone)) {
+      return Alert.alert("Error", "Phone number must contain only digits!");
+    }
+
+    // ✅ Kiểm tra độ dài (tuỳ vùng, ví dụ 10 số)
+    if (phone.length < 9 || phone.length > 11) {
+      return Alert.alert(
+        "Error",
+        "Phone number must be between 9 and 11 digits!"
+      );
+    }
+
+    // Gửi request cập nhật
     const res = await updateProfile(fullName, phone, address);
     if (res.success) {
       setIsEditing(false);
       Alert.alert("Success", "Profile updated successfully!");
     } else {
-      Alert.alert("Error", res.err);
+      Alert.alert("Error", res.err || "Failed to update profile.");
     }
   };
 
