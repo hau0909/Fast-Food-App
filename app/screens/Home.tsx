@@ -1,17 +1,20 @@
 import { Alert, Text, View } from "react-native";
 import FilterBar from "../components/FilterBar";
 import { GLOBAL_STYLE } from "../styles/globalStyle";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Product } from "../type/Product";
 import { getAllProduct, ProductFilters } from "../services/productApi";
 import ProductList from "../components/ProductList";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function Home() {
   const [products, setProducts] = useState<Product[] | null>(null);
 
-  useEffect(() => {
-    getProducts({});
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getProducts({});
+    }, [])
+  );
 
   const getProducts = async (currentFilters: ProductFilters | {}) => {
     const result = await getAllProduct(currentFilters);
