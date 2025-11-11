@@ -59,6 +59,9 @@ export default function AdminProductsPage() {
   const [imagePreview, setImagePreview] = useState<string>("")
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null)
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const prevPriceRef = useRef<string>("")
+  const prevDiscountPriceRef = useRef<string>("")
+  const prevCaloriesRef = useRef<string>("")
   const [formData, setFormData] = useState<FormData>({
     name: "",
     description: "",
@@ -165,6 +168,9 @@ export default function AdminProductsPage() {
     })
     setImagePreview("")
     setEditingProduct(null)
+    prevPriceRef.current = ""
+    prevDiscountPriceRef.current = ""
+    prevCaloriesRef.current = ""
   }
 
   const openCreateDialog = () => {
@@ -175,17 +181,23 @@ export default function AdminProductsPage() {
   const openEditDialog = (product: Product) => {
     setEditingProduct(product)
     const categoryId = typeof product.category_id === "string" ? product.category_id : product.category_id?._id || ""
+    const priceStr = String(product.price)
+    const discountPriceStr = product.discount_price ? String(product.discount_price) : ""
+    const caloriesStr = product.calories ? String(product.calories) : ""
     setFormData({
       name: product.name,
       description: product.description ?? "",
-      price: String(product.price),
-      discount_price: product.discount_price ? String(product.discount_price) : "",
-      calories: product.calories ? String(product.calories) : "",
+      price: priceStr,
+      discount_price: discountPriceStr,
+      calories: caloriesStr,
       image_url: typeof product.image_url === "string" ? product.image_url : "",
       category_id: categoryId,
       is_available: product.is_available ?? true,
       image_file: undefined,
     })
+    prevPriceRef.current = priceStr
+    prevDiscountPriceRef.current = discountPriceStr
+    prevCaloriesRef.current = caloriesStr
     setImagePreview(buildImageUrl(product.image_url))
     setOpenDialog(true)
   }
@@ -372,14 +384,47 @@ export default function AdminProductsPage() {
                             <label className="text-sm font-medium text-foreground">Giá gốc ($) *</label>
                             <Input
                               type="number"
-                              step={10}
+                              step="any"
                               min={0}
                               value={formData.price}
                               onChange={(e) => {
                                 const value = e.target.value;
                                 const numValue = parseFloat(value);
+                                const prevValue = parseFloat(prevPriceRef.current) || 0;
+                                
+                                // Kiểm tra nếu thay đổi do spinner click (tăng/giảm 1)
+                                if (!isNaN(numValue) && !isNaN(prevValue) && prevPriceRef.current !== "") {
+                                  const diff = Math.abs(numValue - prevValue);
+                                  if (diff > 0.99 && diff < 1.01) {
+                                    // Thay đổi do spinner, điều chỉnh thành 10
+                                    const newValue = numValue > prevValue ? prevValue + 10 : Math.max(0, prevValue - 10);
+                                    prevPriceRef.current = newValue.toString();
+                                    setFormData({ ...formData, price: newValue.toString() });
+                                    return;
+                                  }
+                                }
+                                
                                 if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                  prevPriceRef.current = value;
                                   setFormData({ ...formData, price: value });
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                                  e.preventDefault();
+                                  const currentValue = parseFloat(formData.price) || 0;
+                                  const newValue = e.key === "ArrowUp" ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                  prevPriceRef.current = newValue.toString();
+                                  setFormData({ ...formData, price: newValue.toString() });
+                                }
+                              }}
+                              onWheel={(e) => {
+                                if (document.activeElement === e.currentTarget) {
+                                  e.preventDefault();
+                                  const currentValue = parseFloat(formData.price) || 0;
+                                  const newValue = e.deltaY < 0 ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                  prevPriceRef.current = newValue.toString();
+                                  setFormData({ ...formData, price: newValue.toString() });
                                 }
                               }}
                               placeholder="0"
@@ -390,14 +435,47 @@ export default function AdminProductsPage() {
                             <label className="text-sm font-medium text-foreground">Giá khuyến mãi ($)</label>
                             <Input
                               type="number"
-                              step={10}
+                              step="any"
                               min={0}
                               value={formData.discount_price}
                               onChange={(e) => {
                                 const value = e.target.value;
                                 const numValue = parseFloat(value);
+                                const prevValue = parseFloat(prevDiscountPriceRef.current) || 0;
+                                
+                                // Kiểm tra nếu thay đổi do spinner click (tăng/giảm 1)
+                                if (!isNaN(numValue) && !isNaN(prevValue) && prevDiscountPriceRef.current !== "") {
+                                  const diff = Math.abs(numValue - prevValue);
+                                  if (diff > 0.99 && diff < 1.01) {
+                                    // Thay đổi do spinner, điều chỉnh thành 10
+                                    const newValue = numValue > prevValue ? prevValue + 10 : Math.max(0, prevValue - 10);
+                                    prevDiscountPriceRef.current = newValue.toString();
+                                    setFormData({ ...formData, discount_price: newValue.toString() });
+                                    return;
+                                  }
+                                }
+                                
                                 if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                  prevDiscountPriceRef.current = value;
                                   setFormData({ ...formData, discount_price: value });
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                                  e.preventDefault();
+                                  const currentValue = parseFloat(formData.discount_price) || 0;
+                                  const newValue = e.key === "ArrowUp" ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                  prevDiscountPriceRef.current = newValue.toString();
+                                  setFormData({ ...formData, discount_price: newValue.toString() });
+                                }
+                              }}
+                              onWheel={(e) => {
+                                if (document.activeElement === e.currentTarget) {
+                                  e.preventDefault();
+                                  const currentValue = parseFloat(formData.discount_price) || 0;
+                                  const newValue = e.deltaY < 0 ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                  prevDiscountPriceRef.current = newValue.toString();
+                                  setFormData({ ...formData, discount_price: newValue.toString() });
                                 }
                               }}
                               placeholder="Không cần nhập nếu cần"
@@ -409,14 +487,47 @@ export default function AdminProductsPage() {
                           <label className="text-sm font-medium text-foreground">Calories</label>
                           <Input
                             type="number"
-                            step={10}
+                            step="any"
                             min={0}
                             value={formData.calories}
                             onChange={(e) => {
                               const value = e.target.value;
                               const numValue = parseFloat(value);
+                              const prevValue = parseFloat(prevCaloriesRef.current) || 0;
+                              
+                              // Kiểm tra nếu thay đổi do spinner click (tăng/giảm 1)
+                              if (!isNaN(numValue) && !isNaN(prevValue) && prevCaloriesRef.current !== "") {
+                                const diff = Math.abs(numValue - prevValue);
+                                if (diff > 0.99 && diff < 1.01) {
+                                  // Thay đổi do spinner, điều chỉnh thành 10
+                                  const newValue = numValue > prevValue ? prevValue + 10 : Math.max(0, prevValue - 10);
+                                  prevCaloriesRef.current = newValue.toString();
+                                  setFormData({ ...formData, calories: newValue.toString() });
+                                  return;
+                                }
+                              }
+                              
                               if (value === "" || (!isNaN(numValue) && numValue >= 0)) {
+                                prevCaloriesRef.current = value;
                                 setFormData({ ...formData, calories: value });
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                                e.preventDefault();
+                                const currentValue = parseFloat(formData.calories) || 0;
+                                const newValue = e.key === "ArrowUp" ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                prevCaloriesRef.current = newValue.toString();
+                                setFormData({ ...formData, calories: newValue.toString() });
+                              }
+                            }}
+                            onWheel={(e) => {
+                              if (document.activeElement === e.currentTarget) {
+                                e.preventDefault();
+                                const currentValue = parseFloat(formData.calories) || 0;
+                                const newValue = e.deltaY < 0 ? currentValue + 10 : Math.max(0, currentValue - 10);
+                                prevCaloriesRef.current = newValue.toString();
+                                setFormData({ ...formData, calories: newValue.toString() });
                               }
                             }}
                             placeholder="Không cần nhập nếu cần"

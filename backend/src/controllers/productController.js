@@ -1,5 +1,39 @@
 const Product = require("../models/Product");
 
+// Helper function to build full image URL from request
+const buildImageUrlFromRequest = (req, imageUrl) => {
+  if (!imageUrl) return imageUrl;
+  
+  // Nếu đã là full URL external (http/https), giữ nguyên
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    // Nếu là localhost, thay thế bằng host từ request
+    if (imageUrl.includes("localhost") || imageUrl.includes("127.0.0.1")) {
+      const protocol = req.protocol || "http";
+      const host = req.get("host") || `${req.hostname}:${process.env.PORT || 8000}`;
+      // Giữ nguyên path sau localhost
+      const path = imageUrl.split("/").slice(3).join("/");
+      return `${protocol}://${host}/${path}`;
+    }
+    return imageUrl;
+  }
+  
+  // Nếu là relative path hoặc filename, build full URL
+  const protocol = req.protocol || "http";
+  const host = req.get("host") || `${req.hostname}:${process.env.PORT || 8000}`;
+  const normalizedPath = imageUrl.startsWith("/") ? imageUrl : `/uploads/${imageUrl}`;
+  return `${protocol}://${host}${normalizedPath}`;
+};
+
+// Helper function to transform product with full image URL
+const transformProduct = (product, req) => {
+  if (!product) return product;
+  const productObj = product.toObject ? product.toObject() : product;
+  if (productObj.image_url) {
+    productObj.image_url = buildImageUrlFromRequest(req, productObj.image_url);
+  }
+  return productObj;
+};
+
 // [GET] /api/product
 const getAllProducts = async (req, res, next) => {
   try {
@@ -13,12 +47,15 @@ const getAllProducts = async (req, res, next) => {
       Product.countDocuments(filter),
     ]);
 
+    // Transform products to include full image URLs based on request
+    const transformedProducts = products.map(product => transformProduct(product, req));
+
     return res.json({
       total,
       // page: pageNum,
       // limit: limitNum,
       // totalPages: Math.ceil(total / limitNum),
-      data: products,
+      data: transformedProducts,
     });
   } catch (err) {
     return next(err);
@@ -33,7 +70,8 @@ const getProductById = async (req, res, next) => {
       "name"
     );
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json(product);
+    const transformedProduct = transformProduct(product, req);
+    res.json(transformedProduct);
   } catch (err) {
     next(err);
   }
@@ -47,7 +85,9 @@ const normalizeNumber = (value) => {
 
 const formatImagePath = (file) => {
   if (!file) return undefined;
-  return file.filename;
+  // Build full URL instead of just filename
+  const baseUrl = process.env.API_BASE_URL || `http://localhost:${process.env.PORT || 8000}`;
+  return `${baseUrl}/uploads/${file.filename}`;
 };
 
 const createProduct = async (req,res) => {
@@ -57,9 +97,16 @@ const createProduct = async (req,res) => {
     payload.discount_price = normalizeNumber(payload.discount_price) ?? null;
     payload.calories = normalizeNumber(payload.calories) ?? null;
 
+    // Nếu có file upload, ưu tiên file upload (lưu full URL local)
     const imagePath = formatImagePath(req.file);
     if (imagePath) {
       payload.image_url = imagePath;
+    } else if (payload.image_url && (payload.image_url.startsWith("http://") || payload.image_url.startsWith("https://"))) {
+      // Nếu không có file upload nhưng có image_url là full URL external, giữ nguyên
+      // payload.image_url đã là full URL, không cần thay đổi
+    } else if (payload.image_url === "") {
+      // Nếu image_url là chuỗi rỗng, xóa nó
+      delete payload.image_url;
     }
 
     const product = new Product(payload);
@@ -86,10 +133,15 @@ const updateProduct = async(req, res) => {
       if (payload.calories === undefined) payload.calories = null;
     }
 
+    // Nếu có file upload, ưu tiên file upload (lưu full URL local)
     const imagePath = formatImagePath(req.file);
     if (imagePath) {
       payload.image_url = imagePath;
+    } else if (payload.image_url && (payload.image_url.startsWith("http://") || payload.image_url.startsWith("https://"))) {
+      // Nếu không có file upload nhưng có image_url là full URL external, giữ nguyên
+      // payload.image_url đã là full URL, không cần thay đổi
     } else if (payload.image_url === "") {
+      // Nếu image_url là chuỗi rỗng, xóa nó
       delete payload.image_url;
     }
 

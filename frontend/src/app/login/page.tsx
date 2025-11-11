@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
-import { LogIn, Eye, EyeOff } from "lucide-react"
+import { LogIn, Eye, EyeOff, X } from "lucide-react"
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("")
@@ -12,7 +12,28 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState("")
+  const [toast, setToast] = useState<{ message: string; type: "error" | "success" } | null>(null)
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+      }
+    }
+  }, [])
+
+  const showToast = (message: string, type: "error" | "success" = "error") => {
+    setToast({ message, type })
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null)
+      toastTimerRef.current = null
+    }, 5000)
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,10 +46,20 @@ export default function AdminLoginPage() {
         { withCredentials: true },
       )
       const token: string | undefined = res?.data?.token
+      const role: string | undefined = res?.data?.role
+      
       if (!token) {
         setError("Không nhận được token")
         return
       }
+
+      // Kiểm tra role - chỉ cho phép admin đăng nhập
+      if (role !== "admin") {
+        showToast("Bạn không phải là admin. Vui lòng đăng nhập bằng tài khoản admin.")
+        setIsSubmitting(false)
+        return
+      }
+
       if (typeof window !== "undefined") {
         localStorage.setItem("token", token)
         window.dispatchEvent(new StorageEvent("storage", { key: "token", newValue: token }))
@@ -106,6 +137,33 @@ export default function AdminLoginPage() {
           </form>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-5">
+          <div
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border ${
+              toast.type === "error"
+                ? "bg-destructive/95 text-destructive-foreground border-destructive"
+                : "bg-green-500/95 text-white border-green-600"
+            }`}
+          >
+            <p className="text-sm font-medium">{toast.message}</p>
+            <button
+              onClick={() => {
+                setToast(null)
+                if (toastTimerRef.current) {
+                  clearTimeout(toastTimerRef.current)
+                  toastTimerRef.current = null
+                }
+              }}
+              className="ml-2 hover:opacity-80 transition-opacity"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

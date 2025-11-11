@@ -16,79 +16,83 @@ const NavItem = ({ href, label }: { href: string; label: string }) => (
 
 export default function Home() {
   return (
-    <div className="bg-background min-h-screen">
-      <div className="gap-0 grid grid-cols-12">
-        <aside className="top-0 sticky flex flex-col col-span-12 md:col-span-3 lg:col-span-2 bg-sidebar p-6 border-sidebar-border border-r min-h-screen">
+    <div className="min-h-screen bg-background flex flex-col">
+      <div className="flex h-screen overflow-hidden">
+        {/* Sidebar */}
+        <aside className="w-full md:w-64 lg:w-64 bg-sidebar border-r border-sidebar-border min-h-screen p-6 flex flex-col sticky top-0 z-20">
           <div className="mb-8">
-            <Link href="/" className="font-bold text-sidebar-foreground text-xl">
+            <Link href="/" className="text-xl font-bold text-sidebar-foreground">
               Admin
             </Link>
-            <p className="mt-1 text-sidebar-foreground/60 text-xs">Dashboard</p>
+            <p className="text-xs text-sidebar-foreground/60 mt-1">Dashboard</p>
           </div>
           
-          <nav className="flex-1 space-y-2">
+          <nav className="space-y-2 flex-1">
             <NavItem href="/products" label="Products" />
             <NavItem href="/categories" label="Categories" />
             <NavItem href="/orders" label="Orders" />
             <NavItem href="/users" label="Users"/>
-            <NavItem href= "/reviews" label= "Reviews" />
-            
+            <NavItem href="/reviews" label="Reviews" />
           </nav>
-          <div className="mt-auto pt-4 border-sidebar-border border-t">
+          
+          <div className="pt-4 border-t border-sidebar-border mt-auto">
             <HeaderWithSettings position="inline" />
           </div>
         </aside>
 
-        <main className="col-span-12 md:col-span-9 lg:col-span-10 p-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-8">
-              <h1 className="font-bold text-foreground text-3xl">Dashboard</h1>
-              <p className="mt-2 text-muted-foreground">Welcome back! Here's your admin overview.</p>
-            </div>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 p-8 overflow-y-auto">
+            <div className="max-w-7xl mx-auto w-full">
+              <div className="mb-8">
+                <h1 className="font-bold text-foreground text-3xl">Dashboard</h1>
+                <p className="mt-2 text-muted-foreground">Welcome back! Here's your admin overview.</p>
+              </div>
 
-            <div className="mb-6">
-              <DashboardGraph />
-            </div>
+              <div className="mb-6">
+                <DashboardGraph />
+              </div>
 
-            <div className="gap-6 grid sm:grid-cols-2 lg:grid-cols-3">
-              <DashboardCard
-                icon={Package}
-                title="Products"
-                description="Manage dishes and menus"
-                href="/products"
-                color="primary"
-              />
-              <DashboardCard
-                icon={Layers}
-                title="Categories"
-                description="Organize product categories"
-                href="/categories"
-                color="primary"
-              />
-              <DashboardCard
-                icon={ShoppingCart}
-                title="Orders"
-                description="View and update orders"
-                href="/orders"
-                color="primary"
-              />
-              <DashboardCard
-                icon={Users}
-                title="Users"
-                description="View and update orders"
-                href="/users"
-                color="primary"
-              />
-              <DashboardCard
-                icon={Star}
-                title="Reviews"
-                description="View and update orders"
-                href="/reviews"
-                color="primary"
-              />
+              <div className="gap-6 grid sm:grid-cols-2 lg:grid-cols-3">
+                <DashboardCard
+                  icon={Package}
+                  title="Products"
+                  description="Manage dishes and menus"
+                  href="/products"
+                  color="primary"
+                />
+                <DashboardCard
+                  icon={Layers}
+                  title="Categories"
+                  description="Organize product categories"
+                  href="/categories"
+                  color="primary"
+                />
+                <DashboardCard
+                  icon={ShoppingCart}
+                  title="Orders"
+                  description="View and update orders"
+                  href="/orders"
+                  color="primary"
+                />
+                <DashboardCard
+                  icon={Users}
+                  title="Users"
+                  description="View and update orders"
+                  href="/users"
+                  color="primary"
+                />
+                <DashboardCard
+                  icon={Star}
+                  title="Reviews"
+                  description="View and update orders"
+                  href="/reviews"
+                  color="primary"
+                />
+              </div>
             </div>
+          </main>
         </div>
-      </main>
       </div>
     </div>
   )
