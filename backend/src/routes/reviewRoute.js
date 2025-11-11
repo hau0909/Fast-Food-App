@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require('../middlewares/auth');
+const { verifyToken, isAdmin } = require('../middlewares/auth');
 
 const router = express.Router();
 
@@ -12,11 +12,11 @@ const {
 
 // Reviews
 // optional query: ?approved=true|false
-router.get("/", getReviews);
+router.get("/", verifyToken, isAdmin, getReviews);
 
-// ADMIN ROUTES(NOTE: Add admin auth middleware here when available, e.g. `isAdmin`)
-router.patch("/:id/approve",verifyToken, approveReview);
-router.patch("/:id/hide",verifyToken, hideReview);
-router.delete("/:id",verifyToken, deleteReview);
+// ADMIN ROUTES - require admin role
+router.patch("/:id/approve", verifyToken, isAdmin, approveReview);
+router.patch("/:id/hide", verifyToken, isAdmin, hideReview);
+router.delete("/:id", verifyToken, isAdmin, deleteReview);
 
 module.exports = router;

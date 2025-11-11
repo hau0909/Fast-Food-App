@@ -4,6 +4,7 @@ const connectDB = require("./src/config/db");
 const cors = require("cors");
 const categoryRoutes = require("./src/routes/categoryRoutes");
 const productRoutes = require("./src/routes/productRoutes");
+const adminProductRoutes = require("./src/routes/adminProductRoutes");
 const orderRoutes = require("./src/routes/orderRoutes");
 require("dotenv").config();
 
@@ -34,7 +35,7 @@ async function start() {
   app.use("/api/admin/users", require("./src/routes/userRoute"));
   app.use("/api/admin/dashboard", require("./src/routes/dashboardRoute"));
   app.use("/api/admin/categories", categoryRoutes);
-    app.use("/api/admin/products", productRoutes);
+    app.use("/api/admin/products", adminProductRoutes);
     app.use("/api/admin/orders", orderRoutes);
 
     //* User routes

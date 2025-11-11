@@ -1,5 +1,5 @@
 const express = require("express");
-const { verifyToken } = require('../middlewares/auth');
+const { verifyToken, isAdmin } = require('../middlewares/auth');
 const router = express.Router();
 
 const {
@@ -9,11 +9,11 @@ const {
 } = require("../controllers/userController");
 
 
-// ADMIN ROUTES(NOTE: Add admin auth middleware here when available, e.g. `isAdmin`)
+// ADMIN ROUTES - require admin role
 
 // Users
-router.get("/", verifyToken, listUsers);
-router.patch("/:id/role", verifyToken, updateUserRole);
-router.delete("/:id", verifyToken, deleteUser);
+router.get("/", verifyToken, isAdmin, listUsers);
+router.patch("/:id/role", verifyToken, isAdmin, updateUserRole);
+router.delete("/:id", verifyToken, isAdmin, deleteUser);
 
 module.exports = router;
