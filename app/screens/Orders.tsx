@@ -11,7 +11,6 @@ import {
 import { GLOBAL_STYLE } from "../styles/globalStyle";
 import { COLORS } from "../styles/colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
-// import { getUserOrders } from "../services/orderApi"; // API lấy đơn hàng (GIỮ NGUYÊN COMMENT)
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import OrdersHeader from "../components/OrdersHeader";
 import { cancelOrder, getUserOrders } from "../services/orderApi";
@@ -19,91 +18,6 @@ import { Order } from "../type/Order";
 import { OrderItem } from "../type/OrderItem";
 import { getProductById } from "../services/productApi";
 import { formatMoney } from "../utils/formatMoney";
-
-// --- DỮ LIỆU MẪU (Sample Orders) ĐÃ CẬP NHẬT ---
-const sampleOrders = [
-  {
-    _id: "60c72b2f9b2e8c0015f4e0c1",
-    status: "delivered", // Giao thành công
-    createdAt: "2023-11-01T10:00:00.000Z",
-    total_price: 59.99,
-    items: [
-      {
-        product: {
-          _id: "prod101",
-          name: "Classic Leather Wallet",
-        },
-        quantity: 1,
-        price: 59.99,
-      },
-    ],
-  },
-  {
-    _id: "60c72b2f9b2e8c0015f4e0c2",
-    status: "processing", // Đang xử lý
-    createdAt: "2023-11-05T15:30:00.000Z",
-    total_price: 125.5,
-    items: [
-      {
-        product: {
-          _id: "prod205",
-          name: "Wireless Bluetooth Headphones",
-        },
-        quantity: 1,
-        price: 99.5,
-      },
-      {
-        product: {
-          _id: "prod310",
-          name: "USB-C Charging Cable",
-        },
-        quantity: 2,
-        price: 13.0, // 13.00 * 2 = 26.00
-      },
-    ], // Total = 99.50 + 26.00 = 125.50
-  },
-  {
-    _id: "60c72b2f9b2e8c0015f4e0c3",
-    status: "pending", // Đang chờ
-    createdAt: "2023-11-08T09:15:00.000Z",
-    total_price: 35.0,
-    items: [
-      {
-        product: {
-          _id: "prod404",
-          name: "Reusable Coffee Cup",
-        },
-        quantity: 1,
-        price: 35.0,
-      },
-    ],
-  },
-  {
-    _id: "60c72b2f9b2e8c0015f4e0c4",
-    status: "cancelled", // Đã hủy
-    createdAt: "2023-11-08T10:15:00.000Z",
-    total_price: 88.0,
-    items: [
-      {
-        product: {
-          _id: "prod101",
-          name: "Classic Leather Wallet",
-        },
-        quantity: 1,
-        price: 58.0, // Giá có thể khác so với đơn hàng đầu tiên
-      },
-      {
-        product: {
-          _id: "prod500",
-          name: "Hardcover Notebook",
-        },
-        quantity: 2,
-        price: 15.0, // 15.00 * 2 = 30.00
-      },
-    ], // Total = 58.00 + 30.00 = 88.00
-  },
-];
-// --- KẾT THÚC DỮ LIỆU MẪU ---
 
 export default function OrderHistoryScreen() {
   const navigation = useNavigation();
@@ -163,23 +77,6 @@ export default function OrderHistoryScreen() {
       // 1. Lọc ra các item thuộc đơn hàng này
       const myItems = orderItems.filter((item) => item.order_id === order._id);
 
-      // Nếu không có sản phẩm nào, chỉ hiển thị tóm tắt (phòng trường hợp)
-      if (myItems.length === 0) {
-        const summaryString = [
-          `----------------------------------`,
-          `Total: $${formatMoney(order.total_price)}`,
-          "",
-          `Status: ${capitalize(order.status)}`,
-          `Payment: ${capitalize(order.payment_status)}`,
-        ].join("\n");
-
-        Alert.alert(
-          `Order #${order._id.slice(-6).toUpperCase()}`,
-          summaryString
-        );
-        return;
-      }
-
       try {
         // (Gợi ý UX: Bạn có thể hiển thị một spinner/loading ở đây)
 
@@ -214,6 +111,10 @@ export default function OrderHistoryScreen() {
           `Shipping fee: ${formatMoney(order.shipping_fee)}`,
           `Total: ${formatMoney(order.total_price)}`,
           "",
+          `Note: ${capitalize(order.note)}`,
+          "",
+          `Address: ${capitalize(order.delivery_address)}`,
+          `Phone number: ${capitalize(order.phone_number)}`,
           `Status: ${capitalize(order.status)}`,
           `Payment: ${capitalize(order.payment_status)}`,
         ].join("\n");
