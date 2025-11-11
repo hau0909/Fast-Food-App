@@ -13,6 +13,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useState } from "react";
 import { CartItem } from "../type/CartItem";
 import { deleteCartItem, updateCartItemQuantity } from "../services/cartApi";
+import { getImageUrl } from "../utils/getImgUrl";
 
 export default function CartListItem({
   cartItem,
@@ -89,11 +90,7 @@ export default function CartListItem({
     >
       <Image
         style={styles.img}
-        source={
-          product?.image_url
-            ? { uri: product.image_url }
-            : { uri: defaultImage }
-        }
+        source={{ uri: getImageUrl(product.image_url) }}
       />
 
       {/* name */}

@@ -18,6 +18,7 @@ import CheckoutHeader from "../components/CheckoutHeader";
 import { createOrder } from "../services/orderApi";
 import { getProfile } from "../services/profileApi";
 import { clearCart } from "../services/cartApi";
+import { getImageUrl } from "../utils/getImgUrl";
 
 export default function Checkout({ route, navigation }: any) {
   const [cart, setCart] = useState<Cart | null>(route.params?.cart || null);
@@ -131,13 +132,11 @@ function CheckoutItem({ item }: { item: CartItem }) {
   const { product, quantity } = item;
   const price = product?.price || 0;
   const total = quantity * price;
-  const defaultImage =
-    "https://cdn-icons-png.flaticon.com/512/5787/5787100.png";
 
   return (
     <View style={styles.itemContainer}>
       <Image
-        source={{ uri: product?.image_url || defaultImage }}
+        source={{ uri: getImageUrl(product.image_url) }}
         style={styles.image}
       />
       <View style={{ flex: 1, marginLeft: 10 }}>
