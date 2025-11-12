@@ -30,9 +30,9 @@ export default function OrderHistoryScreen() {
 
     if (result.success && result.data) {
       const { orders, orderItems } = result.data;
-      setLoading(false);
       setOrders(orders);
       setOrderItems(orderItems);
+      setLoading(false);  
     }
   };
 

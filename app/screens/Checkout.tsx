@@ -109,14 +109,6 @@ export default function Checkout({ route, navigation }: any) {
     );
   }
 
-  if (!cart || !cart.items || cart.items.length === 0) {
-    return (
-      <View style={[GLOBAL_STYLE.centered, { flex: 1 }]}>
-        <Text style={styles.emptyText}>No items to checkout.</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={[GLOBAL_STYLE.container, { paddingBottom: 90 }]}>
       <CheckoutHeader />
