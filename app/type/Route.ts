@@ -1,7 +1,11 @@
 import { Product } from "./Product";
 
 export type RootStackParamList = {
-  Auth: undefined;
+  Auth:
+    | {
+        screen: keyof AuthParamList;
+      }
+    | undefined;
   MainTabs:
     | {
         screen: keyof TabParamList;
@@ -16,4 +20,9 @@ export type TabParamList = {
   Home: undefined;
   Cart: undefined;
   Profiles: undefined;
+};
+
+export type AuthParamList = {
+  Register: undefined;
+  Login: undefined;
 };

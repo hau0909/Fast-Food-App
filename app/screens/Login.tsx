@@ -11,7 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const { login } = useAuth();
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const navigation = useNavigation();
   const [isLogging, setIsLogging] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

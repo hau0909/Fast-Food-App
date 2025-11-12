@@ -8,7 +8,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { signUpRequest } from "../services/auth";
 
 export default function Register() {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const navigation = useNavigation();
 
   const [isSigningUp, setIsSigningUp] = useState(false);
   const [email, setEmail] = useState("");

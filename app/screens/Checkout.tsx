@@ -19,16 +19,30 @@ import { createOrder } from "../services/orderApi";
 import { getProfile } from "../services/profileApi";
 import { clearCart } from "../services/cartApi";
 import { getImageUrl } from "../utils/getImgUrl";
+import { User } from "../type/User";
 
 export default function Checkout({ route, navigation }: any) {
   const [cart, setCart] = useState<Cart | null>(route.params?.cart || null);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<User | null>(null);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      const res = await getProfile();
+
+      if (res.success && res.data) {
+        setUserProfile(res.data);
+      } else {
+        Alert.alert("Error", res.err || "Failed to load profile");
+      }
+    };
+
     if (cart) {
       setTotal(calculateTotalPrice(cart));
     }
+
+    fetchUserProfile();
   }, [cart]);
 
   const handlePlaceOrder = async () => {
@@ -107,6 +121,13 @@ export default function Checkout({ route, navigation }: any) {
     <View style={[GLOBAL_STYLE.container, { paddingBottom: 90 }]}>
       <CheckoutHeader />
 
+      <View style={{ margin: 10 }}>
+        <Text style={[GLOBAL_STYLE.subtitle]}>User Information</Text>
+        <Text>Name: {userProfile?.full_name}</Text>
+        <Text>Phone: {userProfile?.phone_number}</Text>
+        <Text>Adress: {userProfile?.address}</Text>
+      </View>
+
       <FlatList
         data={cart.items}
         keyExtractor={(item) => item._id}
@@ -117,7 +138,13 @@ export default function Checkout({ route, navigation }: any) {
       <View style={[GLOBAL_STYLE.row, styles.footer]}>
         <View>
           <Text style={styles.totalLabel}>Total</Text>
-          <Text style={styles.totalAmount}>${total.toFixed(2)}</Text>
+          <View style={GLOBAL_STYLE.row}>
+            <Text style={styles.totalAmount}>${total.toFixed(2)}</Text>
+            <Text style={[styles.emptyText, { fontSize: 16 }]}>
+              {" "}
+              + $2 for delivery
+            </Text>
+          </View>
         </View>
         <TouchableOpacity style={styles.btn} onPress={handlePlaceOrder}>
           <Text style={styles.btnText}>Place Order</Text>

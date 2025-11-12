@@ -18,7 +18,7 @@ import { getProfile, updateProfile } from "../services/profileApi";
 import { useAuth } from "../context/AuthContext";
 
 export default function ProfileScreen() {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  const navigation = useNavigation();
   const { logout } = useAuth();
 
   const [fullName, setFullName] = useState("");
