@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev-backend": "npm run dev --prefix backend",
     "start-backend": "npm start --prefix backend",
+    "dev-frontend": "npm run dev --prefix frontend",
+    "start-frontend": "npm start --prefix frontend",
     "start-app": "npm start --prefix app",
-    "dev": "concurrently \"npm:dev-backend\" \"npm:start-app\"",
-    "start": "concurrently \"npm:start-backend\" \"npm:start-app\""
+    "dev": "concurrently \"npm:dev-backend\" \"npm:start-app\" \"npm:dev-frontend\"",
+    "start": "concurrently \"npm:start-backend\" \"npm:start-app\" \"npm:start-frontend\""
   },
   "keywords": [],
   "author": "",
